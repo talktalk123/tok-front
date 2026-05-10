@@ -1,0 +1,30 @@
+---
+title:
+slug:
+summary:
+category: clinic-info
+tags:
+publishedAt:
+language: ko-KR
+---
+<h2>섹션 1 제목</h2>
+<p>본문 내용을 한 단락으로 적습니다.</p>
+
+<h2>섹션 2 제목</h2>
+<ul>
+  <li>항목 1</li>
+  <li>항목 2</li>
+  <li>항목 3</li>
+</ul>
+
+<h2>세부 안내</h2>
+<h3>하위 항목 A</h3>
+<p>설명 본문...</p>
+
+<h3>하위 항목 B</h3>
+<p>설명 본문...</p>
+
+<blockquote>꼭 알아두실 점이 있다면 여기에 강조합니다.</blockquote>
+
+<h2>마무리</h2>
+<p>요약 또는 다음 단계 안내(예약·전화 문의).</p>
