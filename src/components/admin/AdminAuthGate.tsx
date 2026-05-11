@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiFetch, clearToken, getToken, setToken } from "@/lib/api/client";
 
-const SESSION_KEY = "tok_admin_session_v1";
-// TODO: replace with backend auth. For now, use NEXT_PUBLIC_ADMIN_PASSCODE or fall back to "tokbareun-admin".
-const PASSCODE =
-  process.env.NEXT_PUBLIC_ADMIN_PASSCODE ?? "tokbareun-admin";
+interface AdminInfo {
+  id: number;
+  loginId: string;
+  name: string;
+  role: string | null;
+}
 
 interface AdminAuthGateProps {
   children: React.ReactNode;
@@ -13,28 +16,65 @@ interface AdminAuthGateProps {
 
 export default function AdminAuthGate({ children }: AdminAuthGateProps) {
   const [authed, setAuthed] = useState<boolean | null>(null);
-  const [input, setInput] = useState("");
+  const [admin, setAdmin] = useState<AdminInfo | null>(null);
+  const [loginId, setLoginId] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setAuthed(window.sessionStorage.getItem(SESSION_KEY) === "1");
+    let cancelled = false;
+    (async () => {
+      const token = getToken();
+      if (!token) {
+        if (!cancelled) setAuthed(false);
+        return;
+      }
+      try {
+        const me = await apiFetch<AdminInfo>("/api/auth/me");
+        if (cancelled) return;
+        setAdmin(me);
+        setAuthed(true);
+      } catch {
+        if (cancelled) return;
+        clearToken();
+        setAuthed(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input === PASSCODE) {
-      window.sessionStorage.setItem(SESSION_KEY, "1");
+    setError("");
+    setSubmitting(true);
+    try {
+      const data = await apiFetch<{
+        accessToken: string;
+        admin: AdminInfo;
+      }>("/api/auth/login", {
+        method: "POST",
+        body: { loginId, password },
+      });
+      setToken(data.accessToken);
+      setAdmin(data.admin);
       setAuthed(true);
-      setError("");
-    } else {
-      setError("비밀번호가 틀렸습니다.");
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "로그인 중 오류가 발생했습니다.",
+      );
+      setSubmitting(false);
     }
   };
 
   const handleLogout = () => {
-    window.sessionStorage.removeItem(SESSION_KEY);
+    clearToken();
+    setAdmin(null);
     setAuthed(false);
+    setLoginId("");
+    setPassword("");
   };
 
   if (authed === null) {
@@ -60,21 +100,36 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
               관리자 로그인
             </h1>
             <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
-              현재는 임시 패스코드 인증입니다. 백엔드 연결 시 실제 인증으로
-              교체될 예정입니다.
+              아이디와 비밀번호로 로그인합니다.
             </p>
           </div>
+          <label className="block mb-3">
+            <span className="block text-sm font-medium text-neutral-700 mb-2">
+              아이디
+            </span>
+            <input
+              type="text"
+              value={loginId}
+              onChange={(e) => setLoginId(e.target.value)}
+              autoFocus
+              autoComplete="username"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-primary text-neutral-900"
+              placeholder="login_id"
+              required
+            />
+          </label>
           <label className="block mb-4">
             <span className="block text-sm font-medium text-neutral-700 mb-2">
-              패스코드
+              비밀번호
             </span>
             <input
               type="password"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              autoFocus
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-primary text-neutral-900"
-              placeholder="패스코드 입력"
+              placeholder="비밀번호"
+              required
             />
           </label>
           {error && (
@@ -82,9 +137,10 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
           )}
           <button
             type="submit"
-            className="w-full px-4 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark transition-colors"
+            disabled={submitting}
+            className="w-full px-4 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark transition-colors disabled:bg-neutral-300"
           >
-            로그인
+            {submitting ? "로그인 중..." : "로그인"}
           </button>
         </form>
       </div>
@@ -94,12 +150,15 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
   return (
     <>
       {children}
-      <button
-        onClick={handleLogout}
-        className="fixed bottom-4 right-4 z-50 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg shadow-lg hover:bg-neutral-800 transition-colors"
-      >
-        로그아웃
-      </button>
+      <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg shadow-lg">
+        {admin && <span className="opacity-80">{admin.name}</span>}
+        <button
+          onClick={handleLogout}
+          className="font-bold hover:underline"
+        >
+          로그아웃
+        </button>
+      </div>
     </>
   );
 }

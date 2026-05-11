@@ -17,8 +17,18 @@ export default function EditPostPage({
   const [post, setPost] = useState<AiPost | null | undefined>(undefined);
 
   useEffect(() => {
-    const found = getPost(slug);
-    setPost(found ?? null);
+    let cancelled = false;
+    (async () => {
+      try {
+        const found = await getPost(slug);
+        if (!cancelled) setPost(found ?? null);
+      } catch {
+        if (!cancelled) setPost(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   if (post === undefined) {

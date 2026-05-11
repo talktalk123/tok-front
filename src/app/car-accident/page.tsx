@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const CAR_ACCIDENT_FAQ: FAQItem[] = [
+  {
+    q: "교통사고 후 한의원 진료를 받으려면 무엇을 준비해야 하나요?",
+    a: "자동차보험 진료가 필요한 경우 사고접수번호를 알려주시면 접수 절차를 안내드릴 수 있습니다. 보험사 접수 여부와 사고접수번호를 미리 확인해오시면 내원 과정이 더 수월합니다.",
+  },
+  {
+    q: "사고 직후에는 괜찮았는데 며칠 뒤 아플 수 있나요?",
+    a: "교통사고 후 목 통증과 두통, 어깨·등 통증, 피로감, 어지럼 같은 증상은 사고 직후보다 며칠 뒤 나타나는 경우가 있습니다. 초기 상태를 확인하고 경과를 살피는 것이 도움이 됩니다.",
+  },
+  {
+    q: "교통사고 진료에서는 어떤 증상을 확인하나요?",
+    a: "목·허리 통증, 두통, 어깨와 등 긴장, 손발 저림, 몸살 같은 전신 불편감, 수면 변화 등을 확인합니다. 사고 경위와 통증이 심해지는 자세도 함께 살펴봅니다.",
+  },
+  {
+    q: "자동차보험으로 어떤 치료를 받을 수 있나요?",
+    a: "자동차보험 적용 범위와 환자 상태에 따라 침, 약침, 추나, 한약, 물리치료 등 진료 방향이 달라질 수 있습니다. 실제 적용 여부는 보험 접수 상황과 진찰 결과에 따라 안내드립니다.",
+  },
+  {
+    q: "교통사고 후 얼마나 치료받아야 하나요?",
+    a: "사고 충격의 정도, 증상 기간, 통증 부위, 일상생활 불편감에 따라 달라질 수 있습니다. 처음 진료에서 현재 상태를 확인하고 경과를 보며 치료 간격과 방향을 조정합니다.",
+  },
+];
 
 export default function CarAccidentPage() {
   return (
@@ -214,29 +239,9 @@ export default function CarAccidentPage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">교통사고 진료 FAQ</h2>
           </div>
+          <FAQSchema items={CAR_ACCIDENT_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "교통사고 후 한의원 진료를 받으려면 무엇을 준비해야 하나요?",
-                a: "자동차보험 진료가 필요한 경우 사고접수번호를 알려주시면 접수 절차를 안내드릴 수 있습니다. 보험사 접수 여부와 사고접수번호를 미리 확인해오시면 내원 과정이 더 수월합니다.",
-              },
-              {
-                q: "사고 직후에는 괜찮았는데 며칠 뒤 아플 수 있나요?",
-                a: "교통사고 후 목 통증과 두통, 어깨·등 통증, 피로감, 어지럼 같은 증상은 사고 직후보다 며칠 뒤 나타나는 경우가 있습니다. 초기 상태를 확인하고 경과를 살피는 것이 도움이 됩니다.",
-              },
-              {
-                q: "교통사고 진료에서는 어떤 증상을 확인하나요?",
-                a: "목·허리 통증, 두통, 어깨와 등 긴장, 손발 저림, 몸살 같은 전신 불편감, 수면 변화 등을 확인합니다. 사고 경위와 통증이 심해지는 자세도 함께 살펴봅니다.",
-              },
-              {
-                q: "자동차보험으로 어떤 치료를 받을 수 있나요?",
-                a: "자동차보험 적용 범위와 환자 상태에 따라 침, 약침, 추나, 한약, 물리치료 등 진료 방향이 달라질 수 있습니다. 실제 적용 여부는 보험 접수 상황과 진찰 결과에 따라 안내드립니다.",
-              },
-              {
-                q: "교통사고 후 얼마나 치료받아야 하나요?",
-                a: "사고 충격의 정도, 증상 기간, 통증 부위, 일상생활 불편감에 따라 달라질 수 있습니다. 처음 진료에서 현재 상태를 확인하고 경과를 보며 치료 간격과 방향을 조정합니다.",
-              },
-            ].map((item, i) => (
+            {CAR_ACCIDENT_FAQ.map((item, i) => (
               <details key={i} className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-50 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -274,6 +279,8 @@ export default function CarAccidentPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

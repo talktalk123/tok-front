@@ -9,14 +9,25 @@ export default function AdminDashboard() {
   const [latest, setLatest] = useState<{ title: string; updatedAt: string } | null>(null);
 
   useEffect(() => {
-    const posts = listPosts();
-    setPostCount(posts.length);
-    if (posts.length > 0) {
-      const sorted = [...posts].sort((a, b) =>
-        b.updatedAt.localeCompare(a.updatedAt),
-      );
-      setLatest({ title: sorted[0].title, updatedAt: sorted[0].updatedAt });
-    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const posts = await listPosts();
+        if (cancelled) return;
+        setPostCount(posts.length);
+        if (posts.length > 0) {
+          const sorted = [...posts].sort((a, b) =>
+            b.updatedAt.localeCompare(a.updatedAt),
+          );
+          setLatest({ title: sorted[0].title, updatedAt: sorted[0].updatedAt });
+        }
+      } catch {
+        // ignore — 인증 안 됐거나 백엔드 미연결
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -27,8 +38,8 @@ export default function AdminDashboard() {
         </p>
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">대시보드</h1>
         <p className="text-neutral-500">
-          관리자 페이지에 오신 것을 환영합니다. 현재는 임시 저장(localStorage)
-          기반이며 백엔드가 연결되면 실제 사이트에 반영됩니다.
+          관리자 페이지에 오신 것을 환영합니다. 변경 사항은 즉시 백엔드 DB에 저장되며,
+          공개 페이지는 짧은 캐시 주기(약 30초)로 반영됩니다.
         </p>
       </header>
 
@@ -59,9 +70,9 @@ export default function AdminDashboard() {
           <p className="text-xs text-primary mb-2 font-medium uppercase tracking-wider">
             저장 모드
           </p>
-          <p className="text-base font-bold text-neutral-900 mb-1">로컬 임시</p>
+          <p className="text-base font-bold text-neutral-900 mb-1">백엔드 DB</p>
           <p className="text-xs text-neutral-600 leading-relaxed">
-            백엔드 연결 전까지는 이 브라우저에만 저장됩니다.
+            모든 변경 사항이 즉시 운영 DB에 반영됩니다.
           </p>
         </div>
       </div>

@@ -4,17 +4,21 @@ import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "@/lib/ai-posts";
 import { SITE_CONFIG } from "@/lib/site-config";
 
+export const revalidate = 30;
+export const dynamicParams = true;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return {};
 
   const url = `${SITE_CONFIG.url}/ai-content/${post.slug}`;
@@ -40,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function AiPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   const url = `${SITE_CONFIG.url}/ai-content/${post.slug}`;

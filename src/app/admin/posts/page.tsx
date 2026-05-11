@@ -3,29 +3,40 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { AiPost } from "@/lib/ai-posts";
-import { deletePost, listPosts, resetToSeed } from "@/lib/admin/posts-store";
+import { deletePost, listPosts } from "@/lib/admin/posts-store";
 
 export default function AdminPostsList() {
   const [posts, setPosts] = useState<AiPost[]>([]);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const refresh = () => setPosts(listPosts());
+  const refresh = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await listPosts();
+      setPosts(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "글 목록을 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     refresh();
   }, []);
 
-  const handleDelete = (slug: string) => {
-    deletePost(slug);
-    refresh();
-    setConfirmDelete(null);
-  };
-
-  const handleReset = () => {
-    if (!confirm("로컬 변경사항을 모두 초기화하고 시드 데이터로 되돌립니다. 진행할까요?"))
-      return;
-    resetToSeed();
-    refresh();
+  const handleDelete = async (slug: string) => {
+    try {
+      await deletePost(slug);
+      await refresh();
+      setConfirmDelete(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "삭제에 실패했습니다.");
+      setConfirmDelete(null);
+    }
   };
 
   return (
@@ -41,12 +52,6 @@ export default function AdminPostsList() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 bg-white border border-neutral-200 text-neutral-700 rounded-lg text-sm font-bold hover:bg-neutral-50 transition-colors"
-          >
-            시드로 초기화
-          </button>
           <Link
             href="/admin/posts/new"
             className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-colors flex items-center gap-2"
@@ -56,6 +61,12 @@ export default function AdminPostsList() {
           </Link>
         </div>
       </header>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+          {error}
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
         <table className="w-full">
@@ -76,7 +87,13 @@ export default function AdminPostsList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100">
-            {posts.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-12 text-center text-neutral-400 text-sm">
+                  불러오는 중...
+                </td>
+              </tr>
+            ) : posts.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-neutral-400 text-sm">
                   아직 글이 없습니다. <Link href="/admin/posts/new" className="text-primary underline">새 글 작성</Link>

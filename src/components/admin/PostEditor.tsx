@@ -26,7 +26,9 @@ export default function PostEditor({ initial, mode }: PostEditorProps) {
 
   const parsed = useMemo(() => parsePost(text), [text]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
 
@@ -37,17 +39,19 @@ export default function PostEditor({ initial, mode }: PostEditorProps) {
       return;
     }
 
+    setSubmitting(true);
     try {
       if (mode === "create") {
-        createPost(parsed.post);
+        await createPost(parsed.post);
       } else {
-        updatePost(originalSlug, parsed.post);
+        await updatePost(originalSlug, parsed.post);
       }
       router.push("/admin/posts");
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.",
       );
+      setSubmitting(false);
     }
   };
 
@@ -183,10 +187,14 @@ language: ko-KR
           <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-neutral-100">
             <button
               type="submit"
-              disabled={!parsed.post}
+              disabled={!parsed.post || submitting}
               className="w-full px-4 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark transition-colors disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed"
             >
-              {mode === "create" ? "글 등록" : "변경 저장"}
+              {submitting
+                ? "저장 중..."
+                : mode === "create"
+                  ? "글 등록"
+                  : "변경 저장"}
             </button>
             <button
               type="button"

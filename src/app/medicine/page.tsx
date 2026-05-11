@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const MEDICINE_FAQ: FAQItem[] = [
+  {
+    q: "한약은 어떤 기준으로 처방하나요?",
+    a: "한약은 부족한 부분을 채우는 보약이 필요한 경우도 있고, 몸 안의 순환이 막혀 먼저 풀어주어야 하는 경우도 있습니다. 본원은 맥진·설진·복진과 생활 패턴, 증상 변화를 함께 확인해 보충, 순환, 배출 중 어떤 방향이 먼저 필요한지 구분합니다.",
+  },
+  {
+    q: "보약 중심 한약과 순환·배출을 돕는 한약은 어떻게 다른가요?",
+    a: "보약 중심 한약은 기력, 체력, 회복력처럼 부족한 부분을 채우는 데 초점을 둡니다. 반면 순환과 배출을 돕는 한약은 몸이 무겁거나 붓고, 소화가 막히고, 흐름이 정체된 상태를 먼저 풀어주는 데 초점을 둡니다. 본원은 두 방향의 우선순위를 구분해 처방 방향을 정합니다.",
+  },
+  {
+    q: "톡바른경희한의원의 한약은 어떤 점을 중요하게 보나요?",
+    a: "복용 중 어떤 변화가 생기는지 확인하고, 이후 진료에서 남은 증상을 더 정확히 전달할 수 있도록 안내하는 것을 중요하게 봅니다. 성인 기준으로 물을 제외한 순수 한약재를 2kg 이상 사용하는 원칙을 두고 있습니다.",
+  },
+  {
+    q: "한약 설명서를 자세히 써주는 이유는 무엇인가요?",
+    a: "환자가 본인 몸 상태와 치료 방향을 이해해야 복용 중 변화를 잘 확인할 수 있기 때문입니다. 어려운 한의학 용어를 그대로 전달하기보다 일상적으로 와닿는 말로 풀어 설명하려고 합니다.",
+  },
+  {
+    q: "피로, 수면, 소화불량이 같이 있을 때는 어떻게 보나요?",
+    a: "여러 증상이 함께 있을 때는 한 가지 원인으로 단정하지 않고 몸 상태를 나누어 확인합니다. 소화, 수면, 열감, 부종, 스트레스 반응을 함께 보면서 보충, 순환, 배출 중 어떤 방향이 먼저 필요한지 구분합니다.",
+  },
+];
 
 export default function MedicinePage() {
   return (
@@ -246,29 +271,9 @@ export default function MedicinePage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">한약 진료 FAQ</h2>
           </div>
+          <FAQSchema items={MEDICINE_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "한약은 어떤 기준으로 처방하나요?",
-                a: "한약은 부족한 부분을 채우는 보약이 필요한 경우도 있고, 몸 안의 순환이 막혀 먼저 풀어주어야 하는 경우도 있습니다. 본원은 맥진·설진·복진과 생활 패턴, 증상 변화를 함께 확인해 보충, 순환, 배출 중 어떤 방향이 먼저 필요한지 구분합니다.",
-              },
-              {
-                q: "보약 중심 한약과 순환·배출을 돕는 한약은 어떻게 다른가요?",
-                a: "보약 중심 한약은 기력, 체력, 회복력처럼 부족한 부분을 채우는 데 초점을 둡니다. 반면 순환과 배출을 돕는 한약은 몸이 무겁거나 붓고, 소화가 막히고, 흐름이 정체된 상태를 먼저 풀어주는 데 초점을 둡니다. 본원은 두 방향의 우선순위를 구분해 처방 방향을 정합니다.",
-              },
-              {
-                q: "톡바른경희한의원의 한약은 어떤 점을 중요하게 보나요?",
-                a: "복용 중 어떤 변화가 생기는지 확인하고, 이후 진료에서 남은 증상을 더 정확히 전달할 수 있도록 안내하는 것을 중요하게 봅니다. 성인 기준으로 물을 제외한 순수 한약재를 2kg 이상 사용하는 원칙을 두고 있습니다.",
-              },
-              {
-                q: "한약 설명서를 자세히 써주는 이유는 무엇인가요?",
-                a: "환자가 본인 몸 상태와 치료 방향을 이해해야 복용 중 변화를 잘 확인할 수 있기 때문입니다. 어려운 한의학 용어를 그대로 전달하기보다 일상적으로 와닿는 말로 풀어 설명하려고 합니다.",
-              },
-              {
-                q: "피로, 수면, 소화불량이 같이 있을 때는 어떻게 보나요?",
-                a: "여러 증상이 함께 있을 때는 한 가지 원인으로 단정하지 않고 몸 상태를 나누어 확인합니다. 소화, 수면, 열감, 부종, 스트레스 반응을 함께 보면서 보충, 순환, 배출 중 어떤 방향이 먼저 필요한지 구분합니다.",
-              },
-            ].map((item, i) => (
+            {MEDICINE_FAQ.map((item, i) => (
               <details key={i} className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-50 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -306,6 +311,8 @@ export default function MedicinePage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </div>
   );
 }

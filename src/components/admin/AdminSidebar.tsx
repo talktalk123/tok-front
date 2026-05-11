@@ -7,7 +7,6 @@ const navItems = [
   { href: "/admin", label: "대시보드", icon: "dashboard", exact: true },
   { href: "/admin/posts", label: "AI 게시판", icon: "article" },
   { href: "/admin/settings", label: "사이트 설정", icon: "settings" },
-  { href: "/admin/export", label: "내보내기", icon: "file_download" },
 ];
 
 export default function AdminSidebar() {

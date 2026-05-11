@@ -1,11 +1,11 @@
 import { getAllPosts } from "@/lib/ai-posts";
 import { SITE_CONFIG } from "@/lib/site-config";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
 export async function GET() {
   const baseUrl = SITE_CONFIG.url;
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
 
   const md = `# ${SITE_CONFIG.name}
 

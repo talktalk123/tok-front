@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const CHUNA_FAQ: FAQItem[] = [
+  {
+    q: "추나요법은 어떤 방식으로 진행하나요?",
+    a: "본원에서는 골반교정과 척추도인안교요법 기반의 교정 도구 접근을 활용한 추나 치료를 진행합니다. 체형과 움직임을 확인한 뒤 필요한 부위에 맞춰 시행하며, 상태에 따라 침·약침·체외충격파를 함께 고려합니다.",
+  },
+  {
+    q: "집중형·방사형 체외충격파는 어떻게 다르게 쓰이나요?",
+    a: "집중형은 더 깊거나 특정 지점에 집중할 때, 방사형은 넓은 근육·근막 부위에 적용할 때 고려할 수 있습니다. 실제 적용은 통증 부위, 조직 깊이, 압통 양상에 따라 달라집니다.",
+  },
+  {
+    q: "약침은 어떤 경우에 사용하나요?",
+    a: "약침은 침치료의 자극에 약침액의 국소 작용을 더해, 통증 부위의 염증 반응과 근육 긴장, 회복 과정을 함께 고려할 수 있는 치료입니다. 통증 양상과 부위에 따라 일반 침치료와 병행해 치료 방향을 정합니다.",
+  },
+  {
+    q: "혈자리를 이용한 침치료는 무엇이 다른가요?",
+    a: "통증 부위와 주변 혈자리 반응을 함께 살피는 방식으로 접근할 수 있습니다. 통증 부위와 연결된 근육 긴장, 움직임, 혈자리 반응을 함께 확인하면서 치료 방향을 정합니다.",
+  },
+  {
+    q: "통증이 반복될 때는 어느 부위를 함께 보나요?",
+    a: "아픈 부위만 보지 않고 체형, 관절 움직임, 근육 긴장, 반복되는 생활습관을 함께 확인합니다. 목 통증이라도 어깨, 등, 골반 움직임이 영향을 줄 수 있어 전체 흐름을 함께 살핍니다.",
+  },
+];
 
 export default function ChunaPage() {
   return (
@@ -194,29 +219,9 @@ export default function ChunaPage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">추나·통증 진료 FAQ</h2>
           </div>
+          <FAQSchema items={CHUNA_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "추나요법은 어떤 방식으로 진행하나요?",
-                a: "본원에서는 골반교정과 척추도인안교요법 기반의 교정 도구 접근을 활용한 추나 치료를 진행합니다. 체형과 움직임을 확인한 뒤 필요한 부위에 맞춰 시행하며, 상태에 따라 침·약침·체외충격파를 함께 고려합니다.",
-              },
-              {
-                q: "집중형·방사형 체외충격파는 어떻게 다르게 쓰이나요?",
-                a: "집중형은 더 깊거나 특정 지점에 집중할 때, 방사형은 넓은 근육·근막 부위에 적용할 때 고려할 수 있습니다. 실제 적용은 통증 부위, 조직 깊이, 압통 양상에 따라 달라집니다.",
-              },
-              {
-                q: "약침은 어떤 경우에 사용하나요?",
-                a: "약침은 침치료의 자극에 약침액의 국소 작용을 더해, 통증 부위의 염증 반응과 근육 긴장, 회복 과정을 함께 고려할 수 있는 치료입니다. 통증 양상과 부위에 따라 일반 침치료와 병행해 치료 방향을 정합니다.",
-              },
-              {
-                q: "혈자리를 이용한 침치료는 무엇이 다른가요?",
-                a: "통증 부위와 주변 혈자리 반응을 함께 살피는 방식으로 접근할 수 있습니다. 통증 부위와 연결된 근육 긴장, 움직임, 혈자리 반응을 함께 확인하면서 치료 방향을 정합니다.",
-              },
-              {
-                q: "통증이 반복될 때는 어느 부위를 함께 보나요?",
-                a: "아픈 부위만 보지 않고 체형, 관절 움직임, 근육 긴장, 반복되는 생활습관을 함께 확인합니다. 목 통증이라도 어깨, 등, 골반 움직임이 영향을 줄 수 있어 전체 흐름을 함께 살핍니다.",
-              },
-            ].map((item, i) => (
+            {CHUNA_FAQ.map((item, i) => (
               <details key={i} className="group bg-neutral-50 rounded-2xl border border-neutral-100 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-100 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -254,6 +259,8 @@ export default function ChunaPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

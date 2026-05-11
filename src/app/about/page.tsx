@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const ABOUT_FAQ: FAQItem[] = [
+  {
+    q: "톡바른경희한의원은 어떤 진료를 하나요?",
+    a: "한약, 추나요법, 침, 약침, 체외충격파, 자기장치료, 피부(레이저, 리프팅, 피부질환 등) 진료를 진행합니다. 환자별로 상태에 맞춰 설명하고 치료 방향을 정합니다.",
+  },
+  {
+    q: "치료는 어떤 기준으로 나누어 보나요?",
+    a: "근육·인대의 긴장과 염증 반응은 침·약침·체외충격파를, 뼈·관절의 움직임과 체형 불균형은 추나요법을, 소화·수면·피로·열감·부종처럼 몸 안의 기능 문제는 한약을 우선 고려합니다. 한 가지 치료를 정해놓기보다 현재 문제의 층을 나누어 보고, 필요한 순서에 맞춰 단계적으로 안내합니다.",
+  },
+  {
+    q: "피부미용 진료에서 원장의 경험이 왜 중요한가요?",
+    a: "피부미용 진료는 장비 선택과 피부 상태 판단이 함께 이루어져야 합니다. 병변의 종류, 피부 두께, 회복력, 다운타임, 시술 목적을 함께 판단해야 합니다. 이기홍 원장은 스킨부스터와 피부미용 장비의 원리, 성분, 임상 근거를 책과 강의로 정리해온 경험을 바탕으로 진료 방향을 말씀드립니다.",
+  },
+  {
+    q: "피부미용 장비가 다양하면 어떤 점이 좋은가요?",
+    a: "피부 고민은 색소, 홍조, 모공, 흉터, 탄력, 피부결처럼 원인과 깊이가 다를 수 있습니다. 장비 선택지가 다양하면 병변의 종류와 깊이, 피부 회복력, 다운타임 가능성을 고려해 더 세밀하게 시술 방향을 정할 수 있습니다.",
+  },
+  {
+    q: "진료 철학은 무엇인가요?",
+    a: "환자의 증상과 몸 상태, 생활 패턴을 종합적으로 살피고 적절한 순서에 맞춰 치료 방향을 말씀드리는 것입니다. 가능한 부분과 어려운 부분을 나누어 현대인에게 친숙한 말로 설명하려고 합니다.",
+  },
+];
 
 export default function AboutPage() {
   return (
@@ -192,29 +217,9 @@ export default function AboutPage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">톡바른 소개 FAQ</h2>
           </div>
+          <FAQSchema items={ABOUT_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "톡바른경희한의원은 어떤 진료를 하나요?",
-                a: "한약, 추나요법, 침, 약침, 체외충격파, 자기장치료, 피부(레이저, 리프팅, 피부질환 등) 진료를 진행합니다. 환자별로 상태에 맞춰 설명하고 치료 방향을 정합니다.",
-              },
-              {
-                q: "치료는 어떤 기준으로 나누어 보나요?",
-                a: "근육·인대의 긴장과 염증 반응은 침·약침·체외충격파를, 뼈·관절의 움직임과 체형 불균형은 추나요법을, 소화·수면·피로·열감·부종처럼 몸 안의 기능 문제는 한약을 우선 고려합니다. 한 가지 치료를 정해놓기보다 현재 문제의 층을 나누어 보고, 필요한 순서에 맞춰 단계적으로 안내합니다.",
-              },
-              {
-                q: "피부미용 진료에서 원장의 경험이 왜 중요한가요?",
-                a: "피부미용 진료는 장비 선택과 피부 상태 판단이 함께 이루어져야 합니다. 병변의 종류, 피부 두께, 회복력, 다운타임, 시술 목적을 함께 판단해야 합니다. 이기홍 원장은 스킨부스터와 피부미용 장비의 원리, 성분, 임상 근거를 책과 강의로 정리해온 경험을 바탕으로 진료 방향을 말씀드립니다.",
-              },
-              {
-                q: "피부미용 장비가 다양하면 어떤 점이 좋은가요?",
-                a: "피부 고민은 색소, 홍조, 모공, 흉터, 탄력, 피부결처럼 원인과 깊이가 다를 수 있습니다. 장비 선택지가 다양하면 병변의 종류와 깊이, 피부 회복력, 다운타임 가능성을 고려해 더 세밀하게 시술 방향을 정할 수 있습니다.",
-              },
-              {
-                q: "진료 철학은 무엇인가요?",
-                a: "환자의 증상과 몸 상태, 생활 패턴을 종합적으로 살피고 적절한 순서에 맞춰 치료 방향을 말씀드리는 것입니다. 가능한 부분과 어려운 부분을 나누어 현대인에게 친숙한 말로 설명하려고 합니다.",
-              },
-            ].map((item, i) => (
+            {ABOUT_FAQ.map((item, i) => (
               <details key={i} className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-50 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -252,6 +257,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema from "@/components/FAQSchema";
 
 const faqSections = [
   {
@@ -169,8 +171,10 @@ const faqSections = [
 ];
 
 export default function FaqPage() {
+  const allFaqItems = faqSections.flatMap((s) => s.items);
   return (
     <>
+      <FAQSchema items={allFaqItems} />
       <Navbar activePage="/faq" />
 
       {/* Hero */}
@@ -249,6 +253,8 @@ export default function FaqPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

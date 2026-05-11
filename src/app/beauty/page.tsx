@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const BEAUTY_FAQ: FAQItem[] = [
+  {
+    q: "한의원에서도 레이저 진료를 하나요?",
+    a: "본원에서는 피부 상태와 진료 목적에 따라 롱펄스 레이저, 큐스위치 레이저, 피코레이저, CO2 레이저, 니들RF, HIFU, 고주파, 스킨부스터 등을 피부미용 진료에 활용하고 있습니다. 시술 전에는 병변의 종류와 깊이, 피부 회복력, 다운타임 가능성을 함께 살펴 적합한 방향을 안내합니다.",
+  },
+  {
+    q: "톡바른경희한의원에는 어떤 피부미용 장비가 있나요?",
+    a: "롱펄스 532·755·1064nm, 큐스위치 532·1064nm, 피코레이저, CO2 레이저, 1550·1927nm 듀얼 레이저, 308nm 엑시머 계열 장비, 니들RF, HIFU, 바이폴라 고주파, 마이크로웨이브, LDM, 크라이오, 에어젯2, 플라즈마 등 다양한 장비를 활용합니다.",
+  },
+  {
+    q: "스킨부스터는 어떤 기준으로 선택하나요?",
+    a: "PN/PDRN은 피부 회복과 재생 반응을 돕는 방향으로, 엑소좀은 피부 진정과 컨디션 회복, 염증성 피부 고민에 활용하는 방향으로, 히알루론산은 건조감과 피부결, 수분감 개선을 기대하며 선택하는 경우가 많습니다. 본원에서는 피부 상태, 전달 방식, 회복 목적을 함께 확인해 적합한 성분과 시술 방식을 안내합니다.",
+  },
+  {
+    q: "니들RF, HIFU, 고주파, 마이크로웨이브는 어떻게 다르게 쓰이나요?",
+    a: "작용 깊이, 열 전달 방식, 목표 조직이 다릅니다. 처짐, 탄력, 모공, 흉터, 피부 두께, 다운타임 가능성을 확인한 뒤 적합한 방향을 안내합니다.",
+  },
+  {
+    q: "피부미용 시술 전후에는 무엇을 주의해야 하나요?",
+    a: "시술 전후에는 자극 관리, 보습, 자외선 차단이 중요합니다. 다운타임과 주의사항은 시술 종류와 강도, 피부 상태에 따라 달라질 수 있습니다.",
+  },
+];
 
 export default function BeautyPage() {
   return (
@@ -327,29 +352,9 @@ export default function BeautyPage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">피부미용 진료 FAQ</h2>
           </div>
+          <FAQSchema items={BEAUTY_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "한의원에서도 레이저 진료를 하나요?",
-                a: "본원에서는 피부 상태와 진료 목적에 따라 롱펄스 레이저, 큐스위치 레이저, 피코레이저, CO2 레이저, 니들RF, HIFU, 고주파, 스킨부스터 등을 피부미용 진료에 활용하고 있습니다. 시술 전에는 병변의 종류와 깊이, 피부 회복력, 다운타임 가능성을 함께 살펴 적합한 방향을 안내합니다.",
-              },
-              {
-                q: "톡바른경희한의원에는 어떤 피부미용 장비가 있나요?",
-                a: "롱펄스 532·755·1064nm, 큐스위치 532·1064nm, 피코레이저, CO2 레이저, 1550·1927nm 듀얼 레이저, 308nm 엑시머 계열 장비, 니들RF, HIFU, 바이폴라 고주파, 마이크로웨이브, LDM, 크라이오, 에어젯2, 플라즈마 등 다양한 장비를 활용합니다.",
-              },
-              {
-                q: "스킨부스터는 어떤 기준으로 선택하나요?",
-                a: "PN/PDRN은 피부 회복과 재생 반응을 돕는 방향으로, 엑소좀은 피부 진정과 컨디션 회복, 염증성 피부 고민에 활용하는 방향으로, 히알루론산은 건조감과 피부결, 수분감 개선을 기대하며 선택하는 경우가 많습니다. 본원에서는 피부 상태, 전달 방식, 회복 목적을 함께 확인해 적합한 성분과 시술 방식을 안내합니다.",
-              },
-              {
-                q: "니들RF, HIFU, 고주파, 마이크로웨이브는 어떻게 다르게 쓰이나요?",
-                a: "작용 깊이, 열 전달 방식, 목표 조직이 다릅니다. 처짐, 탄력, 모공, 흉터, 피부 두께, 다운타임 가능성을 확인한 뒤 적합한 방향을 안내합니다.",
-              },
-              {
-                q: "피부미용 시술 전후에는 무엇을 주의해야 하나요?",
-                a: "시술 전후에는 자극 관리, 보습, 자외선 차단이 중요합니다. 다운타임과 주의사항은 시술 종류와 강도, 피부 상태에 따라 달라질 수 있습니다.",
-              },
-            ].map((item, i) => (
+            {BEAUTY_FAQ.map((item, i) => (
               <details key={i} className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-50 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -387,6 +392,8 @@ export default function BeautyPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

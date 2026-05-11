@@ -2,9 +2,15 @@ import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/ai-posts";
 import { SITE_CONFIG } from "@/lib/site-config";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 60;
+
+function toW3CDate(date: Date): string {
+  return date.toISOString().split(".")[0] + "Z";
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_CONFIG.url;
-  const now = new Date();
+  const now = toW3CDate(new Date());
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
@@ -18,9 +24,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/ai-content`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
   ];
 
-  const postRoutes: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+  const posts = await getAllPosts();
+  const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${baseUrl}/ai-content/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
+    lastModified: toW3CDate(new Date(post.updatedAt)),
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }));

@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const HOW_TO_COME_FAQ: FAQItem[] = [
+  {
+    q: "예약은 어떻게 하나요?",
+    a: "예약은 전화로 문의해주시면 안내드리겠습니다. 운영 중인 예약 채널은 홈페이지에서 함께 확인하실 수 있습니다.",
+  },
+  {
+    q: "초진 때 무엇을 준비하면 좋나요?",
+    a: "복용 중인 약, 검사 결과, 사고접수번호, 기존 치료 이력, 피부 시술 이력 등이 있다면 가져오시면 진료 방향을 정하는 데 도움이 됩니다.",
+  },
+  {
+    q: "비급여 비용은 어디에서 확인하나요?",
+    a: "비급여 항목과 비용은 진료 항목, 부위, 범위에 따라 달라질 수 있습니다. 내원 시 원내 고지 자료와 상담 안내를 통해 확인하실 수 있습니다.",
+  },
+  {
+    q: "주차는 가능한가요?",
+    a: "건물 주차장을 이용하실 수 있습니다. 만차이거나 주차가 어려운 경우에는 내원 전 전화로 문의해주시면 이용 가능한 방법을 안내드리겠습니다.",
+  },
+  {
+    q: "진료시간은 어떻게 되나요?",
+    a: "평일 09:00~20:00 / 토요일 09:00~14:00 / 공휴일 09:00~13:00 / 일요일 휴진입니다. 공휴일 일정은 변동될 수 있어 내원 전 확인을 권합니다.",
+  },
+];
 
 export default function HowToComePage() {
   return (
@@ -210,29 +235,9 @@ export default function HowToComePage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">진료 안내 FAQ</h2>
           </div>
+          <FAQSchema items={HOW_TO_COME_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "예약은 어떻게 하나요?",
-                a: "예약은 전화로 문의해주시면 안내드리겠습니다. 운영 중인 예약 채널은 홈페이지에서 함께 확인하실 수 있습니다.",
-              },
-              {
-                q: "초진 때 무엇을 준비하면 좋나요?",
-                a: "복용 중인 약, 검사 결과, 사고접수번호, 기존 치료 이력, 피부 시술 이력 등이 있다면 가져오시면 진료 방향을 정하는 데 도움이 됩니다.",
-              },
-              {
-                q: "비급여 비용은 어디에서 확인하나요?",
-                a: "비급여 항목과 비용은 진료 항목, 부위, 범위에 따라 달라질 수 있습니다. 내원 시 원내 고지 자료와 상담 안내를 통해 확인하실 수 있습니다.",
-              },
-              {
-                q: "주차는 가능한가요?",
-                a: "건물 주차장을 이용하실 수 있습니다. 만차이거나 주차가 어려운 경우에는 내원 전 전화로 문의해주시면 이용 가능한 방법을 안내드리겠습니다.",
-              },
-              {
-                q: "진료시간은 어떻게 되나요?",
-                a: "평일 09:00~20:00 / 토요일 09:00~14:00 / 공휴일 09:00~13:00 / 일요일 휴진입니다. 공휴일 일정은 변동될 수 있어 내원 전 확인을 권합니다.",
-              },
-            ].map((item, i) => (
+            {HOW_TO_COME_FAQ.map((item, i) => (
               <details key={i} className="group bg-neutral-50 rounded-2xl border border-neutral-100 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-100 transition-colors">
                   <h3 className="text-base md:text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -252,6 +257,8 @@ export default function HowToComePage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </>
   );
 }

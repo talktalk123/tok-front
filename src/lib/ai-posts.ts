@@ -1,4 +1,4 @@
-import postsData from "@/data/ai-posts.json";
+import { apiFetchServer } from "@/lib/api/server";
 
 export interface AiPost {
   slug: string;
@@ -12,12 +12,55 @@ export interface AiPost {
   updatedAt: string;
 }
 
-export function getAllPosts(): AiPost[] {
-  return [...postsData.posts].sort((a, b) =>
-    b.publishedAt.localeCompare(a.publishedAt),
-  );
+interface BackendPost {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  content: string;
+  category: string;
+  tags: string[];
+  language: string;
+  isPublished: boolean;
+  metadata: unknown;
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId: number | null;
 }
 
-export function getPostBySlug(slug: string): AiPost | undefined {
-  return postsData.posts.find((p) => p.slug === slug);
+function toAiPost(p: BackendPost): AiPost {
+  return {
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary ?? "",
+    content: p.content,
+    category: p.category,
+    tags: p.tags ?? [],
+    language: p.language,
+    publishedAt: p.publishedAt,
+    updatedAt: p.updatedAt,
+  };
+}
+
+export async function getAllPosts(): Promise<AiPost[]> {
+  const data = await apiFetchServer<BackendPost[]>(
+    "/api/posts",
+    { revalidate: 30, tags: ["posts"] },
+  );
+  if (!data) return [];
+  return [...data]
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .map(toAiPost);
+}
+
+export async function getPostBySlug(
+  slug: string,
+): Promise<AiPost | undefined> {
+  const data = await apiFetchServer<BackendPost>(
+    `/api/posts/${slug}`,
+    { revalidate: 30, tags: ["posts", `post:${slug}`] },
+  );
+  if (!data) return undefined;
+  return toAiPost(data);
 }

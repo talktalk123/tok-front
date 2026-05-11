@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/ai-posts";
 import { SITE_CONFIG } from "@/lib/site-config";
 
+export const revalidate = 30;
+
 export const metadata: Metadata = {
   title: `AI 참고 자료 | ${SITE_CONFIG.name}`,
   description:
@@ -16,8 +18,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AiContentIndex() {
-  const posts = getAllPosts();
+export default async function AiContentIndex() {
+  const posts = await getAllPosts();
 
   const collectionLd = {
     "@context": "https://schema.org",

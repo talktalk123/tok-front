@@ -1,5 +1,30 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SiteFooter from "@/components/SiteFooter";
+import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+
+const HOME_FAQ: FAQItem[] = [
+  {
+    q: "톡바른경희한의원 본점은 어떤 진료를 하나요?",
+    a: "한약, 추나·통증치료, 침·약침, 집중형·방사형 체외충격파, 자기장치료, 피부미용 진료를 환자 상태에 맞춰 안내합니다. 증상 하나만 보고 치료를 정하기보다 몸 상태와 생활 패턴을 함께 확인합니다.",
+  },
+  {
+    q: "처음 내원하면 어떤 과정을 거치나요?",
+    a: "불편한 증상과 생활 패턴을 확인한 뒤 필요한 경우 맥진·설진·복진, 체형검사, 근육 긴장도 확인, 피부 상태 확인 등을 진행합니다. 이후 현재 문제의 우선순위와 치료 방향을 설명드립니다.",
+  },
+  {
+    q: "한약, 추나, 피부미용 진료는 예약이 필요한가요?",
+    a: "대기 시간을 줄이기 위해 예약 후 내원을 권합니다. 특히 한약 상담과 피부미용 진료는 상담과 설명 시간이 필요할 수 있습니다.",
+  },
+  {
+    q: "치료는 몇 번 정도 받아야 하나요?",
+    a: "증상 기간, 몸 상태, 치료 목표에 따라 달라질 수 있습니다. 처음 진찰 후 예상 치료 방향과 경과 확인 시점을 안내드립니다.",
+  },
+  {
+    q: "주차와 진료시간은 어떻게 되나요?",
+    a: "진료시간은 평일 09:00~20:00 / 토요일 09:00~14:00 / 공휴일 09:00~13:00 / 일요일 휴진입니다. 건물 내 주차장을 이용하실 수 있으며, 만차이거나 주차가 어려운 경우에는 광주시보건소·공설운동장 인근 공영주차장 등 이용 가능한 방법을 안내드립니다.",
+  },
+];
 
 export default function HomePage() {
   return (
@@ -219,7 +244,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">Traffic Accident</p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">교통사고 진료는 독립 카테고리로<br />자세히 안내합니다</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">교통사고 진료</h2>
               <p className="text-neutral-300 leading-relaxed mb-4">
                 교통사고 진료는 본원에서 중요한 비중을 차지하는 진료 영역입니다. 사고 직후보다 며칠 뒤 목·허리 통증, 두통, 어깨 긴장, 몸살 같은 불편감이 나타나는 경우가 있어 별도 흐름으로 확인합니다.
               </p>
@@ -257,29 +282,9 @@ export default function HomePage() {
             <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">처음 오시기 전 자주 묻는 질문</h2>
           </div>
+          <FAQSchema items={HOME_FAQ} />
           <div className="space-y-4">
-            {[
-              {
-                q: "톡바른경희한의원 본점은 어떤 진료를 하나요?",
-                a: "한약, 추나·통증치료, 침·약침, 집중형·방사형 체외충격파, 자기장치료, 피부미용 진료를 환자 상태에 맞춰 안내합니다. 증상 하나만 보고 치료를 정하기보다 몸 상태와 생활 패턴을 함께 확인합니다.",
-              },
-              {
-                q: "처음 내원하면 어떤 과정을 거치나요?",
-                a: "불편한 증상과 생활 패턴을 확인한 뒤 필요한 경우 맥진·설진·복진, 체형검사, 근육 긴장도 확인, 피부 상태 확인 등을 진행합니다. 이후 현재 문제의 우선순위와 치료 방향을 설명드립니다.",
-              },
-              {
-                q: "한약, 추나, 피부미용 진료는 예약이 필요한가요?",
-                a: "대기 시간을 줄이기 위해 예약 후 내원을 권합니다. 특히 한약 상담과 피부미용 진료는 상담과 설명 시간이 필요할 수 있습니다.",
-              },
-              {
-                q: "치료는 몇 번 정도 받아야 하나요?",
-                a: "증상 기간, 몸 상태, 치료 목표에 따라 달라질 수 있습니다. 처음 진찰 후 예상 치료 방향과 경과 확인 시점을 안내드립니다.",
-              },
-              {
-                q: "주차와 진료시간은 어떻게 되나요?",
-                a: "진료시간은 평일 09:00~20:00 / 토요일 09:00~14:00 / 공휴일 09:00~13:00 / 일요일 휴진입니다. 건물 내 주차장을 이용하실 수 있으며, 만차이거나 주차가 어려운 경우에는 광주시보건소·공설운동장 인근 공영주차장 등 이용 가능한 방법을 안내드립니다.",
-              },
-            ].map((item, i) => (
+            {HOME_FAQ.map((item, i) => (
               <details key={i} className="group bg-neutral-50 rounded-2xl border border-neutral-100 overflow-hidden">
                 <summary className="cursor-pointer list-none p-6 flex justify-between items-start gap-4 hover:bg-neutral-100 transition-colors">
                   <h3 className="text-lg font-bold text-neutral-900 flex-1 leading-snug">Q. {item.q}</h3>
@@ -383,43 +388,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-neutral-100 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div>
-              <div className="text-lg font-bold text-neutral-900 mb-2">톡바른경희한의원 본점</div>
-              <p className="text-sm text-neutral-500 leading-relaxed mb-4">몸 상태를 먼저 살피고,<br />치료 방향을 함께 정합니다.</p>
-              <div className="flex gap-3 text-sm">
-                <a className="text-neutral-600 hover:text-primary transition-colors font-medium" href="https://blog.naver.com/talktalkhani" target="_blank" rel="noopener noreferrer">네이버 블로그</a>
-                <span className="text-neutral-300">·</span>
-                <a className="text-neutral-600 hover:text-primary transition-colors font-medium" href="tel:031-767-0075">전화 예약 031-767-0075</a>
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-bold text-neutral-900 mb-3">진료시간</div>
-              <p className="text-sm text-neutral-500 leading-relaxed">
-                평일 09:00~20:00<br />
-                토요일 09:00~14:00<br />
-                공휴일 09:00~13:00<br />
-                일요일 휴진
-              </p>
-            </div>
-            <div>
-              <div className="text-sm font-bold text-neutral-900 mb-3">연락처</div>
-              <p className="text-sm text-neutral-500 leading-relaxed">
-                031-767-0075<br />
-                경기도 광주시 파발로 187<br />
-                세양빌딩 2층
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-neutral-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-neutral-400 text-sm">© 톡바른경희한의원 본점. All Rights Reserved.</p>
-            <p className="text-neutral-400 text-xs">최종 업데이트: 2026-05-04</p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
