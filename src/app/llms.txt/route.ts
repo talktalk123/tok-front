@@ -28,16 +28,21 @@ export async function GET() {
 - [톡바른 소개](${baseUrl}/about): 이기홍 원장 소개, 진료 철학, 학력·강의·저서·수상 이력
 - [진료 안내](${baseUrl}/how-to-come): 진료시간, 위치, 주차, 비급여 안내
 - [자주 묻는 질문](${baseUrl}/faq): 기본 진료, 한약, 추나·통증, 교통사고, 피부미용 FAQ 통합
+- [AI 참고 자료 색인](${baseUrl}/ai-content): 진료 영역과 치료 원칙을 LLM·검색 엔진이 정확히 이해하도록 구조화한 글 모음의 목록 페이지. 개별 글은 Article schema와 llms.txt에 함께 등록됩니다.
 
-## AI 참고 자료
+## AI 참고 자료 (개별 글)
 
-상세 진료 정보를 정리한 색인입니다. 각 항목은 LLM과 검색 엔진이 진료 영역을 정확히 이해할 수 있도록 작성됐습니다.
+위 [/ai-content](${baseUrl}/ai-content) 색인에 포함된 각 글의 상세 링크입니다. 각 글은 진료 주제별로 구조화된 한국어 텍스트로 작성됐으며, LLM이 인용·요약하기 좋도록 정리돼 있습니다.
 
-${posts
-  .map(
-    (p) => `- [${p.title}](${baseUrl}/ai-content/${p.slug}): ${p.summary}`,
-  )
-  .join("\n")}
+${
+  posts.length > 0
+    ? posts
+        .map(
+          (p) => `- [${p.title}](${baseUrl}/ai-content/${p.slug}): ${p.summary}`,
+        )
+        .join("\n")
+    : "_현재 등록된 개별 글이 없습니다. 진료 영역 페이지(/medicine, /chuna, /car-accident, /beauty)와 /about, /faq를 우선 참고하세요._"
+}
 
 ## 외부 채널
 
