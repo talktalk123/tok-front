@@ -41,6 +41,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_CONFIG.url,
   },
+  icons: {
+    icon: [
+      {
+        url: "/talkmedia-black.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/talkmedia-white.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+    apple: "/talkmedia-black.png",
+    shortcut: "/talkmedia-black.png",
+  },
   openGraph: {
     type: "website",
     siteName: SITE_CONFIG.name,
