@@ -82,6 +82,7 @@ const organizationLd = {
   "@type": "MedicalBusiness",
   "@id": `${SITE_CONFIG.url}/#organization`,
   name: SITE_CONFIG.name,
+  alternateName: [SITE_CONFIG.shortName, "톡바른한의원", "톡바른경희한의원 광주점"],
   url: SITE_CONFIG.url,
   telephone: SITE_CONFIG.phone,
   email: SITE_CONFIG.email,
@@ -106,6 +107,33 @@ const organizationLd = {
     "교통사고 후유증 진료",
   ],
   sameAs: [SITE_CONFIG.blogUrl],
+};
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_CONFIG.url}/#website`,
+  name: SITE_CONFIG.shortName,
+  alternateName: SITE_CONFIG.name,
+  url: SITE_CONFIG.url,
+  inLanguage: "ko-KR",
+  publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
+};
+
+const siteNavigationLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": `${SITE_CONFIG.url}/#sitenav`,
+  name: `${SITE_CONFIG.shortName} 주요 메뉴`,
+  itemListElement: [
+    { "@type": "SiteNavigationElement", position: 1, name: "톡바른 소개", url: `${SITE_CONFIG.url}/about` },
+    { "@type": "SiteNavigationElement", position: 2, name: "한약·보약", url: `${SITE_CONFIG.url}/medicine` },
+    { "@type": "SiteNavigationElement", position: 3, name: "추나·통증", url: `${SITE_CONFIG.url}/chuna` },
+    { "@type": "SiteNavigationElement", position: 4, name: "교통사고", url: `${SITE_CONFIG.url}/car-accident` },
+    { "@type": "SiteNavigationElement", position: 5, name: "피부미용", url: `${SITE_CONFIG.url}/beauty` },
+    { "@type": "SiteNavigationElement", position: 6, name: "진료 안내", url: `${SITE_CONFIG.url}/how-to-come` },
+    { "@type": "SiteNavigationElement", position: 7, name: "FAQ", url: `${SITE_CONFIG.url}/faq` },
+  ],
 };
 
 export default function RootLayout({
@@ -139,6 +167,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteNavigationLd) }}
         />
       </head>
       <body
