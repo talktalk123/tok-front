@@ -54,7 +54,11 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Content-Language", value: "ko-KR" },
           { key: "Link", value: ALTERNATE_LINKS },
-          { key: "Vary", value: "Accept" },
+          {
+            key: "Vary",
+            value:
+              "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+          },
           {
             key: "X-Robots-Tag",
             value:
