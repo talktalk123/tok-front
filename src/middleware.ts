@@ -13,12 +13,12 @@ export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/llms.txt";
     const res = NextResponse.rewrite(url);
-    res.headers.set("Vary", "Accept");
+    res.headers.append("Vary", "Accept");
     return res;
   }
 
   const res = NextResponse.next();
-  res.headers.set("Vary", "Accept");
+  res.headers.append("Vary", "Accept");
   return res;
 }
 
