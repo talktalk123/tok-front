@@ -6,6 +6,31 @@ const ALTERNATE_LINKS = [
   '</sitemap.xml>; rel="sitemap"; type="application/xml"',
 ].join(", ");
 
+// 사용하지 않는 브라우저 기능을 명시적으로 거부 (=()는 모든 origin 거부)
+const PERMISSIONS_POLICY = [
+  "accelerometer=()",
+  "ambient-light-sensor=()",
+  "autoplay=()",
+  "battery=()",
+  "camera=()",
+  "display-capture=()",
+  "fullscreen=(self)",
+  "geolocation=()",
+  "gyroscope=()",
+  "magnetometer=()",
+  "microphone=()",
+  "midi=()",
+  "payment=()",
+  "picture-in-picture=()",
+  "publickey-credentials-get=()",
+  "screen-wake-lock=()",
+  "sync-xhr=()",
+  "usb=()",
+  "web-share=(self)",
+  "xr-spatial-tracking=()",
+  "interest-cohort=()",
+].join(", ");
+
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
@@ -44,6 +69,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Content-Security-Policy", value: CSP },
+          { key: "Permissions-Policy", value: PERMISSIONS_POLICY },
         ],
       },
       {
