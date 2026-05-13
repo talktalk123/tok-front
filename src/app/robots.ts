@@ -16,11 +16,16 @@ const AI_CRAWLERS = [
   "ClaudeBot",
   "anthropic-ai",
   "Claude-Web",
+  "Claude-User",
+  "Claude-SearchBot",
   "Google-Extended",
   "PerplexityBot",
   "Applebot",
   "Applebot-Extended",
   "CCBot",
+  "Amazonbot",
+  "Bytespider",
+  "meta-externalagent",
 ];
 
 export default function robots(): MetadataRoute.Robots {

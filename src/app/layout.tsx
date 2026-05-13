@@ -18,6 +18,9 @@ const lexend = Lexend({
 const NAVER_VERIFICATION = process.env.NEXT_PUBLIC_NAVER_VERIFICATION;
 const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION;
 
+// 빌드 시점을 dateModified·콘텐츠 신선도 신호로 사용
+const BUILD_DATE = new Date().toISOString().split(".")[0] + "Z";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
   title: {
@@ -40,6 +43,15 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: SITE_CONFIG.url,
+  },
+  authors: [
+    { name: SITE_CONFIG.ownerName, url: `${SITE_CONFIG.url}/about` },
+  ],
+  creator: SITE_CONFIG.ownerName,
+  publisher: SITE_CONFIG.name,
+  other: {
+    "article:author": SITE_CONFIG.ownerName,
+    "article:modified_time": BUILD_DATE,
   },
   icons: {
     icon: [
@@ -77,6 +89,20 @@ export const metadata: Metadata = {
     : {}),
 };
 
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${SITE_CONFIG.url}/#person-leekihong`,
+  name: SITE_CONFIG.ownerName,
+  jobTitle: "한의사·대표원장",
+  alumniOf: {
+    "@type": "EducationalOrganization",
+    name: "경희대학교 한의과대학",
+  },
+  worksFor: { "@id": `${SITE_CONFIG.url}/#organization` },
+  url: `${SITE_CONFIG.url}/about`,
+};
+
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
@@ -86,6 +112,7 @@ const organizationLd = {
   url: SITE_CONFIG.url,
   telephone: SITE_CONFIG.phone,
   email: SITE_CONFIG.email,
+  dateModified: BUILD_DATE,
   address: {
     "@type": "PostalAddress",
     streetAddress: SITE_CONFIG.address.streetAddress,
@@ -93,10 +120,8 @@ const organizationLd = {
     addressRegion: SITE_CONFIG.address.addressRegion,
     addressCountry: SITE_CONFIG.address.addressCountry,
   },
-  founder: {
-    "@type": "Person",
-    name: SITE_CONFIG.ownerName,
-  },
+  founder: { "@id": `${SITE_CONFIG.url}/#person-leekihong` },
+  employee: [{ "@id": `${SITE_CONFIG.url}/#person-leekihong` }],
   taxID: SITE_CONFIG.businessNumber,
   medicalSpecialty: [
     "한약 진료",
@@ -117,7 +142,9 @@ const websiteLd = {
   alternateName: SITE_CONFIG.name,
   url: SITE_CONFIG.url,
   inLanguage: "ko-KR",
+  dateModified: BUILD_DATE,
   publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
+  author: { "@id": `${SITE_CONFIG.url}/#person-leekihong` },
 };
 
 const siteNavigationLd = {
@@ -166,6 +193,10 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}
+        />
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
         />
         <script
@@ -180,7 +211,7 @@ export default function RootLayout({
       <body
         className={`${notoSansKR.variable} ${lexend.variable} antialiased`}
       >
-        {children}
+        <main id="main-content">{children}</main>
       </body>
     </html>
   );

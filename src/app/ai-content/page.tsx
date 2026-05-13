@@ -44,7 +44,7 @@ export default async function AiContentIndex() {
   };
 
   return (
-    <main className="bg-white text-neutral-900 min-h-screen">
+    <div className="bg-white text-neutral-900 min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
@@ -113,6 +113,6 @@ export default async function AiContentIndex() {
           </p>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }
