@@ -71,7 +71,7 @@ ${
   return new Response(md, {
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "Cache-Control": "public, max-age=60, s-maxage=60",
       Vary: "Accept",
     },
   });
