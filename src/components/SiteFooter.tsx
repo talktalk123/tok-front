@@ -65,6 +65,96 @@ export default function SiteFooter() {
           </div>
         </div>
 
+        {/* Middle — site navigation (서브링크 후보 강화) */}
+        <nav
+          aria-label="사이트 메뉴"
+          className="border-t border-neutral-100 pt-8 pb-6 mb-2"
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+            <div>
+              <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">
+                진료영역
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <a href="/medicine" className="text-neutral-600 hover:text-primary transition-colors">
+                    한약·보약
+                  </a>
+                </li>
+                <li>
+                  <a href="/chuna" className="text-neutral-600 hover:text-primary transition-colors">
+                    추나·통증
+                  </a>
+                </li>
+                <li>
+                  <a href="/car-accident" className="text-neutral-600 hover:text-primary transition-colors">
+                    교통사고
+                  </a>
+                </li>
+                <li>
+                  <a href="/beauty" className="text-neutral-600 hover:text-primary transition-colors">
+                    피부미용
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">
+                안내
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <a href="/about" className="text-neutral-600 hover:text-primary transition-colors">
+                    톡바른 소개
+                  </a>
+                </li>
+                <li>
+                  <a href="/how-to-come" className="text-neutral-600 hover:text-primary transition-colors">
+                    진료 안내
+                  </a>
+                </li>
+                <li>
+                  <a href="/faq" className="text-neutral-600 hover:text-primary transition-colors">
+                    FAQ
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">
+                채널·자료
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <a
+                    href={SITE_CONFIG.blogUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-600 hover:text-primary transition-colors"
+                  >
+                    네이버 블로그
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={SITE_CONFIG.bookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-600 hover:text-primary transition-colors"
+                  >
+                    네이버 예약
+                  </a>
+                </li>
+                <li>
+                  <a href="/ai-content" className="text-neutral-600 hover:text-primary transition-colors">
+                    AI 참고 자료
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
         {/* Bottom — business info (의료법·전자상거래법 표시 의무 항목) */}
         <div className="border-t border-neutral-100 pt-8">
           <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-neutral-500 mb-3">
