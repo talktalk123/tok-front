@@ -46,6 +46,13 @@ const CSP = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // /favicon.ico 직접 요청 (네이버 봇·크롤러)에 PNG 서빙
+  // 네이버는 HTML <link rel="icon"> 무시하고 /favicon.ico 만 가져감
+  async rewrites() {
+    return [
+      { source: "/favicon.ico", destination: "/talkmedia-black.png" },
+    ];
+  },
   async headers() {
     return [
       {
