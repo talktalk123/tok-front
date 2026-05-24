@@ -55,8 +55,8 @@ export interface CardGridData {
   heading?: string;
   intro?: string;
   columns: 2 | 3 | 4;
-  /** icon=아이콘 원형 배지, number=사각 번호 배지, number-lg=큰 번호 텍스트 */
-  variant?: "icon" | "number" | "number-lg";
+  /** icon=아이콘 원형, number=사각 번호, number-lg=큰 번호, icon-num=아이콘+번호(왼쪽) */
+  variant?: "icon" | "number" | "number-lg" | "icon-num";
   /** 섹션 배경 (기본 neutral) */
   bg?: "white" | "neutral";
   cards: CardItem[];
@@ -156,6 +156,54 @@ export interface RawHtmlData {
   html: string;
 }
 
+/* ── info-columns: 진료시간·병원정보·지도 등 2단 정보 섹션 (비개발자 편집용) ── */
+export interface InfoRow {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}
+export interface InfoLine {
+  icon?: string;
+  text: string;
+  href?: string;
+}
+export interface InfoBtn {
+  label: string;
+  href: string;
+  primary?: boolean;
+}
+export interface InfoNote {
+  icon?: string;
+  title?: string;
+  text: string;
+}
+/** 한 컬럼(패널). kind에 따라 표시 */
+export interface InfoPanel {
+  kind: "card" | "text" | "map";
+  // 공통 / card
+  title?: string;
+  icon?: string;
+  rows?: InfoRow[]; // 진료시간 행
+  lines?: InfoLine[]; // 주소·전화 등 아이콘+텍스트 줄
+  note?: InfoNote; // 박스 안내(주차 등)
+  buttons?: InfoBtn[];
+  // text
+  eyebrow?: string;
+  heading?: string;
+  paragraphs?: string[];
+  // map
+  addressLines?: string[];
+  sub?: string;
+  links?: InfoBtn[];
+}
+export interface InfoColumnsData {
+  eyebrow?: string;
+  heading?: string;
+  bg?: "white" | "neutral";
+  left: InfoPanel;
+  right: InfoPanel;
+}
+
 /** 우하단 고정 플로팅 버튼 (home 등) */
 export interface FloatingToolbarData {
   items: { icon: string; href: string; label: string; primary?: boolean }[];
@@ -203,7 +251,8 @@ export type BlockType =
   | "table"
   | "card-list"
   | "raw-html"
-  | "floating-toolbar";
+  | "floating-toolbar"
+  | "info-columns";
 
 export interface BlockDataMap {
   hero: HeroData;
@@ -219,6 +268,7 @@ export interface BlockDataMap {
   "card-list": CardListData;
   "raw-html": RawHtmlData;
   "floating-toolbar": FloatingToolbarData;
+  "info-columns": InfoColumnsData;
 }
 
 /** 공개/편집 공통 블록. visible 은 admin 편집 시에만 의미. */
@@ -261,6 +311,7 @@ export const BLOCK_REGISTRY: ReadonlyArray<{
   { type: "card-list", label: "리스트 카드", icon: "list_alt" },
   { type: "raw-html", label: "임의 HTML 섹션", icon: "code" },
   { type: "floating-toolbar", label: "플로팅 버튼", icon: "contact_support" },
+  { type: "info-columns", label: "정보 2단 (시간·지도·연락처)", icon: "view_column" },
 ];
 
 export const BLOCK_LABEL: Record<BlockType, string> = Object.fromEntries(
@@ -366,6 +417,27 @@ export function createDefaultBlockData(type: BlockType): BlockDataMap[BlockType]
           { icon: "call", href: "tel:031-767-0075", label: "전화" },
         ],
       } satisfies FloatingToolbarData;
+    case "info-columns":
+      return {
+        eyebrow: "",
+        heading: "",
+        bg: "white",
+        left: {
+          kind: "card",
+          title: "진료시간",
+          icon: "schedule",
+          rows: [
+            { label: "평일 (월-금)", value: "09:00 - 20:00" },
+            { label: "일요일", value: "휴진", highlight: true },
+          ],
+        },
+        right: {
+          kind: "map",
+          title: "톡바른경희한의원 본점",
+          addressLines: ["경기도 광주시 파발로 187", "세양빌딩 2층"],
+          links: [],
+        },
+      } satisfies InfoColumnsData;
   }
 }
 

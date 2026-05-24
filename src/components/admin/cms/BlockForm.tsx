@@ -20,6 +20,11 @@ import type {
   CardListItem,
   RawHtmlData,
   FloatingToolbarData,
+  InfoColumnsData,
+  InfoPanel,
+  InfoRow,
+  InfoLine,
+  InfoBtn,
 } from "@/lib/cms/blocks";
 import { htmlToFields } from "@/lib/cms/blocks";
 
@@ -185,6 +190,146 @@ function ButtonsEditor({
   );
 }
 
+function PanelBtnEditor({
+  buttons,
+  onChange,
+}: {
+  buttons?: InfoBtn[];
+  onChange: (b: InfoBtn[]) => void;
+}) {
+  return (
+    <Repeat<InfoBtn>
+      label="버튼"
+      items={buttons ?? []}
+      makeNew={() => ({ label: "버튼", href: "/", primary: false })}
+      onChange={onChange}
+      render={(b, u) => (
+        <>
+          <Field label="라벨" value={b.label} onChange={(x) => u({ ...b, label: x })} />
+          <Field label="링크" value={b.href} onChange={(x) => u({ ...b, href: x })} />
+          <Select
+            label="강조"
+            value={b.primary ? "y" : "n"}
+            options={[
+              { value: "n", label: "흰색" },
+              { value: "y", label: "주황(강조)" },
+            ]}
+            onChange={(x) => u({ ...b, primary: x === "y" })}
+          />
+        </>
+      )}
+    />
+  );
+}
+
+/** info-columns 한 패널 편집 */
+function PanelForm({
+  panel,
+  onChange,
+}: {
+  panel: InfoPanel;
+  onChange: (p: InfoPanel) => void;
+}) {
+  const p = panel ?? { kind: "card" };
+  const note = p.note ?? { title: "", text: "" };
+  return (
+    <div className="space-y-3 border border-neutral-200 rounded-lg p-3 bg-white">
+      <Select
+        label="패널 종류"
+        value={p.kind ?? "card"}
+        options={[
+          { value: "card", label: "카드 (진료시간·연락처)" },
+          { value: "text", label: "텍스트 (제목+문단)" },
+          { value: "map", label: "지도 카드" },
+        ]}
+        onChange={(v) => onChange({ ...p, kind: v as InfoPanel["kind"] })}
+      />
+      {p.kind === "map" ? (
+        <>
+          <Field label="제목 (예: 톡바른경희한의원 본점)" value={p.title ?? ""} onChange={(v) => onChange({ ...p, title: v })} />
+          <Repeat<string>
+            label="주소 줄"
+            items={p.addressLines ?? []}
+            makeNew={() => ""}
+            onChange={(addressLines) => onChange({ ...p, addressLines })}
+            render={(a, u) => <Field label="" value={a} onChange={u} />}
+          />
+          <Field label="부가 설명 (선택)" value={p.sub ?? ""} onChange={(v) => onChange({ ...p, sub: v })} />
+          <Repeat<InfoBtn>
+            label="지도 링크"
+            items={p.links ?? []}
+            makeNew={() => ({ label: "네이버 지도", href: "" })}
+            onChange={(links) => onChange({ ...p, links })}
+            render={(l, u) => (
+              <>
+                <Field label="라벨" value={l.label} onChange={(x) => u({ ...l, label: x })} />
+                <Field label="링크" value={l.href} onChange={(x) => u({ ...l, href: x })} />
+              </>
+            )}
+          />
+        </>
+      ) : p.kind === "text" ? (
+        <>
+          <Field label="윗 라벨(eyebrow)" value={p.eyebrow ?? ""} onChange={(v) => onChange({ ...p, eyebrow: v })} />
+          <Field label="제목" value={p.heading ?? ""} onChange={(v) => onChange({ ...p, heading: v })} />
+          <Repeat<string>
+            label="문단"
+            items={p.paragraphs ?? []}
+            makeNew={() => ""}
+            onChange={(paragraphs) => onChange({ ...p, paragraphs })}
+            render={(x, u) => <Field label="" value={x} textarea onChange={u} />}
+          />
+          <Field label="박스 안내 제목 (선택)" value={note.title ?? ""} onChange={(v) => onChange({ ...p, note: { ...note, title: v } })} />
+          <Field label="박스 안내 내용 (선택)" value={note.text ?? ""} textarea onChange={(v) => onChange({ ...p, note: { ...note, text: v } })} />
+          <PanelBtnEditor buttons={p.buttons} onChange={(buttons) => onChange({ ...p, buttons })} />
+        </>
+      ) : (
+        <>
+          <Field label="제목 (예: 진료시간 / 병원 정보)" value={p.title ?? ""} onChange={(v) => onChange({ ...p, title: v })} />
+          <Field label="제목 아이콘 (선택, 예: schedule)" value={p.icon ?? ""} onChange={(v) => onChange({ ...p, icon: v })} />
+          <Repeat<InfoRow>
+            label="진료시간 행 (요일 / 시간)"
+            items={p.rows ?? []}
+            makeNew={() => ({ label: "", value: "" })}
+            onChange={(rows) => onChange({ ...p, rows })}
+            render={(r, u) => (
+              <>
+                <Field label="요일/항목" value={r.label} onChange={(x) => u({ ...r, label: x })} />
+                <Field label="시간/값" value={r.value} onChange={(x) => u({ ...r, value: x })} />
+                <Select
+                  label="강조(주황)"
+                  value={r.highlight ? "y" : "n"}
+                  options={[
+                    { value: "n", label: "보통" },
+                    { value: "y", label: "강조(예: 휴진)" },
+                  ]}
+                  onChange={(x) => u({ ...r, highlight: x === "y" })}
+                />
+              </>
+            )}
+          />
+          <Repeat<InfoLine>
+            label="정보 줄 (주소·전화 등)"
+            items={p.lines ?? []}
+            makeNew={() => ({ icon: "location_on", text: "" })}
+            onChange={(lines) => onChange({ ...p, lines })}
+            render={(l, u) => (
+              <>
+                <Field label="아이콘 (예: location_on, call)" value={l.icon ?? ""} onChange={(x) => u({ ...l, icon: x })} />
+                <Field label="내용" value={l.text} onChange={(x) => u({ ...l, text: x })} />
+                <Field label="링크 (선택, 예: tel:031-...)" value={l.href ?? ""} onChange={(x) => u({ ...l, href: x })} />
+              </>
+            )}
+          />
+          <Field label="박스 안내 제목 (선택)" value={note.title ?? ""} onChange={(v) => onChange({ ...p, note: { ...note, title: v } })} />
+          <Field label="박스 안내 내용 (선택)" value={note.text ?? ""} textarea onChange={(v) => onChange({ ...p, note: { ...note, text: v } })} />
+          <PanelBtnEditor buttons={p.buttons} onChange={(buttons) => onChange({ ...p, buttons })} />
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ── 블록 타입별 폼 ─────────────────────────────────────── */
 
 export default function BlockForm({
@@ -268,6 +413,7 @@ export default function BlockForm({
               { value: "icon", label: "아이콘 카드(가운데)" },
               { value: "number", label: "사각 번호 카드" },
               { value: "number-lg", label: "큰 번호 카드" },
+              { value: "icon-num", label: "아이콘+번호 카드(왼쪽)" },
             ]}
             onChange={(v) => onChange({ ...d, variant: v })}
           />
@@ -295,22 +441,26 @@ export default function BlockForm({
             items={d.cards ?? []}
             makeNew={() => ({ icon: "check_circle", title: "카드 제목", desc: "설명" })}
             onChange={(cards) => onChange({ ...d, cards })}
-            render={(c, update) =>
-              d.variant === "number" ? (
+            render={(c, update) => {
+              const v = d.variant ?? "icon";
+              const showIcon = v === "icon" || v === "icon-num";
+              const showNum = v === "number" || v === "number-lg" || v === "icon-num";
+              return (
                 <>
-                  <Field label="번호" value={c.num ?? ""} onChange={(v) => update({ ...c, num: v })} />
-                  <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
-                  <Field label="설명" value={c.desc} textarea onChange={(v) => update({ ...c, desc: v })} />
+                  {showIcon && (
+                    <Field label="아이콘 (material명)" value={c.icon} onChange={(x) => update({ ...c, icon: x })} />
+                  )}
+                  {showNum && (
+                    <Field label="번호 (예: 01)" value={c.num ?? ""} onChange={(x) => update({ ...c, num: x })} />
+                  )}
+                  <Field label="제목" value={c.title} onChange={(x) => update({ ...c, title: x })} />
+                  <Field label="설명" value={c.desc} textarea onChange={(x) => update({ ...c, desc: x })} />
+                  {v === "icon" && (
+                    <Field label="링크 (선택)" value={c.href ?? ""} onChange={(x) => update({ ...c, href: x })} />
+                  )}
                 </>
-              ) : (
-                <>
-                  <Field label="아이콘 (material icon명)" value={c.icon} onChange={(v) => update({ ...c, icon: v })} />
-                  <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
-                  <Field label="설명" value={c.desc} textarea onChange={(v) => update({ ...c, desc: v })} />
-                  <Field label="링크 (선택)" value={c.href ?? ""} onChange={(v) => update({ ...c, href: v })} />
-                </>
-              )
-            }
+              );
+            }}
           />
         </div>
       );
@@ -688,6 +838,28 @@ export default function BlockForm({
             </>
           )}
         />
+      );
+    }
+    case "info-columns": {
+      const d = data as InfoColumnsData;
+      return (
+        <div className="space-y-3">
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "white"}
+            options={[
+              { value: "white", label: "흰색" },
+              { value: "neutral", label: "연회색" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v as "white" | "neutral" })}
+          />
+          <Field label="가운데 제목 (선택)" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="윗 라벨(eyebrow, 선택)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
+          <p className="text-xs font-bold text-neutral-600 pt-2">◀ 왼쪽 패널</p>
+          <PanelForm panel={d.left} onChange={(left) => onChange({ ...d, left })} />
+          <p className="text-xs font-bold text-neutral-600 pt-2">오른쪽 패널 ▶</p>
+          <PanelForm panel={d.right} onChange={(right) => onChange({ ...d, right })} />
+        </div>
       );
     }
     default:

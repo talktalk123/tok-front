@@ -21,6 +21,8 @@ import type {
   CardListData,
   RawHtmlData,
   FloatingToolbarData,
+  InfoColumnsData,
+  InfoPanel,
 } from "@/lib/cms/blocks";
 
 const SECTION = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
@@ -206,7 +208,23 @@ function CardGridBlock({ d }: { d: CardGridData }) {
             )}
           </div>
         )}
-        {d.variant === "number" || d.variant === "number-lg" ? (
+        {d.variant === "icon-num" ? (
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
+            {d.cards.map((c, i) => (
+              <div
+                key={i}
+                className="bg-neutral-50 rounded-2xl p-8 border border-neutral-100 hover:border-primary/40 transition-colors"
+              >
+                <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center mb-5">
+                  <span className="material-symbols-outlined text-2xl">{c.icon}</span>
+                </div>
+                {c.num && <p className="text-xs font-bold text-primary mb-2">{c.num}</p>}
+                <h3 className="text-xl font-bold mb-3 text-neutral-900">{c.title}</h3>
+                <p className="text-neutral-600 leading-relaxed">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        ) : d.variant === "number" || d.variant === "number-lg" ? (
           <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
             {d.cards.map((c, i) => {
               // number-lg: 섹션 배경과 대비되게 카드 색 (white 섹션→회색 카드, neutral 섹션→흰 카드)
@@ -713,6 +731,158 @@ function FloatingToolbarBlock({ d }: { d: FloatingToolbarData }) {
   );
 }
 
+function PanelButtons({ buttons }: { buttons?: { label: string; href: string; primary?: boolean }[] }) {
+  if (!buttons?.length) return null;
+  return (
+    <div className="flex flex-wrap gap-3 mt-2">
+      {buttons.map((b, i) => {
+        const ext = b.href?.startsWith("http");
+        const cls = b.primary
+          ? "px-5 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark transition-all flex items-center gap-2 text-sm"
+          : "px-5 py-3 bg-white border border-neutral-200 text-neutral-800 rounded-lg font-bold hover:bg-neutral-50 transition-all flex items-center gap-2 text-sm";
+        return b.href?.startsWith("tel:") || ext ? (
+          <a key={i} href={b.href} {...(ext && { target: "_blank", rel: "noopener noreferrer" })} className={cls}>
+            {b.label}
+          </a>
+        ) : (
+          <Link key={i} href={b.href} className={cls}>
+            {b.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function InfoPanelView({ p, sectionNeutral }: { p: InfoPanel; sectionNeutral: boolean }) {
+  if (p.kind === "map") {
+    return (
+      <div className="rounded-3xl overflow-hidden shadow-lg min-h-[380px] border border-neutral-200 bg-gradient-to-br from-primary-surface to-white relative flex items-center justify-center p-10">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-primary text-7xl mb-4">location_on</span>
+          {p.title && <h3 className="text-xl font-bold text-neutral-900 mb-2">{p.title}</h3>}
+          {p.addressLines?.map((a, i) => (
+            <p key={i} className="text-neutral-600">{a}</p>
+          ))}
+          {p.sub && <p className="text-sm text-neutral-500 mt-2">{p.sub}</p>}
+          {p.links && p.links.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center mt-6">
+              {p.links.map((l, i) => (
+                <a
+                  key={i}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-white border border-primary/30 text-primary rounded-lg font-bold text-sm hover:bg-primary hover:text-white transition-all"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (p.kind === "text") {
+    return (
+      <div>
+        <Eyebrow text={p.eyebrow} />
+        {p.heading && (
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-neutral-900">{p.heading}</h2>
+        )}
+        {p.paragraphs?.map((para, i) => (
+          <p key={i} className="text-neutral-600 leading-relaxed mb-5">{para}</p>
+        ))}
+        {p.note && (
+          <div className="bg-white rounded-2xl p-6 border-2 border-primary/20 mb-6">
+            <div className="flex items-start gap-3">
+              <span className="material-symbols-outlined text-primary text-2xl flex-shrink-0">{p.note.icon || "info"}</span>
+              <div>
+                {p.note.title && <h3 className="font-bold text-neutral-900 mb-2">{p.note.title}</h3>}
+                <p className="text-sm text-neutral-600 leading-relaxed">{p.note.text}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        <PanelButtons buttons={p.buttons} />
+      </div>
+    );
+  }
+
+  // kind === "card"
+  const cardCls = sectionNeutral
+    ? "bg-white p-10 rounded-3xl border border-neutral-200 shadow-sm"
+    : "bg-neutral-50 p-10 rounded-3xl border border-neutral-100";
+  return (
+    <div className={cardCls}>
+      {p.title && (
+        <div className="flex items-center gap-3 mb-6">
+          {p.icon && <span className="material-symbols-outlined text-primary text-3xl">{p.icon}</span>}
+          <h3 className="text-2xl font-bold text-neutral-900">{p.title}</h3>
+        </div>
+      )}
+      {p.rows && p.rows.length > 0 && (
+        <div className="space-y-1 mb-6">
+          {p.rows.map((r, i) => (
+            <div
+              key={i}
+              className="flex justify-between items-center py-3 border-b border-neutral-100 last:border-b-0"
+            >
+              <span className={`font-medium ${r.highlight ? "text-primary" : "text-neutral-600"}`}>{r.label}</span>
+              <span className={`font-bold ${r.highlight ? "text-primary" : "text-neutral-900"}`}>{r.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {p.lines && p.lines.length > 0 && (
+        <div className="space-y-4 mb-6">
+          {p.lines.map((l, i) => (
+            <div key={i} className="flex items-start gap-4">
+              <span className="material-symbols-outlined text-primary flex-shrink-0">{l.icon || "check"}</span>
+              {l.href ? (
+                <a href={l.href} className="text-neutral-700 font-bold hover:text-primary transition-colors">{l.text}</a>
+              ) : (
+                <p className="text-neutral-700 leading-relaxed">{l.text}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {p.note && (
+        <div className="bg-primary-surface rounded-xl p-5 border border-primary/20 mb-6">
+          {p.note.title && <h4 className="font-bold text-neutral-900 mb-1">{p.note.title}</h4>}
+          <p className="text-sm text-neutral-600 leading-relaxed">{p.note.text}</p>
+        </div>
+      )}
+      <PanelButtons buttons={p.buttons} />
+    </div>
+  );
+}
+
+function InfoColumnsBlock({ d }: { d: InfoColumnsData }) {
+  const sectionNeutral = d.bg === "neutral";
+  return (
+    <section className={`py-24 ${sectionNeutral ? "bg-neutral-50" : "bg-white"}`}>
+      <div className={SECTION}>
+        {(d.heading || d.eyebrow) && (
+          <div className="text-center mb-12">
+            <Eyebrow text={d.eyebrow} />
+            {d.heading && (
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight">{d.heading}</h2>
+            )}
+          </div>
+        )}
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <InfoPanelView p={d.left} sectionNeutral={sectionNeutral} />
+          <InfoPanelView p={d.right} sectionNeutral={sectionNeutral} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** 단일 블록 렌더 */
 export function RenderBlock({ block }: { block: CmsBlock }) {
   switch (block.type) {
@@ -742,6 +912,8 @@ export function RenderBlock({ block }: { block: CmsBlock }) {
       return <RawHtmlBlock d={block.data as RawHtmlData} />;
     case "floating-toolbar":
       return <FloatingToolbarBlock d={block.data as FloatingToolbarData} />;
+    case "info-columns":
+      return <InfoColumnsBlock d={block.data as InfoColumnsData} />;
     default:
       return null;
   }
