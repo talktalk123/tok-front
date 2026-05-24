@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
+import { getCmsPage } from "@/lib/cms/pages";
+import CmsPageShell from "@/components/cms/CmsPage";
 
 const ABOUT_FAQ: FAQItem[] = [
   {
@@ -26,7 +29,25 @@ const ABOUT_FAQ: FAQItem[] = [
   },
 ];
 
-export default function AboutPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getCmsPage("about");
+  const seo = page?.theme?.seo;
+  if (seo?.title || seo?.description) {
+    return { title: seo.title, description: seo.description };
+  }
+  return {};
+}
+
+export default async function AboutPage() {
+  // CMS에 블록이 있으면 CMS로 렌더, 없으면 기존 콘텐츠 폴백 (사이트 안 비게)
+  const page = await getCmsPage("about");
+  if (page && page.blocks.length > 0) {
+    return <CmsPageShell page={page} activePage="/about" />;
+  }
+  return <AboutFallback />;
+}
+
+function AboutFallback() {
   return (
     <>
       <Navbar activePage="/about" />

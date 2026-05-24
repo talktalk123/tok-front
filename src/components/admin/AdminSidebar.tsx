@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/admin", label: "대시보드", icon: "dashboard", exact: true },
+  { href: "/admin/pages", label: "페이지 관리", icon: "web" },
   { href: "/admin/posts", label: "AI 게시판", icon: "article" },
   { href: "/admin/settings", label: "사이트 설정", icon: "settings" },
 ];
