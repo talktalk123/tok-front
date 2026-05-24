@@ -339,6 +339,32 @@ export default function BlockForm({
             onChange={(list) => onChange({ ...d, list })}
             render={(li, update) => <Field label="" value={li} onChange={update} />}
           />
+          <Repeat<string>
+            label="배지 칩 (이력 등, 선택)"
+            items={d.badges ?? []}
+            makeNew={() => ""}
+            onChange={(badges) => onChange({ ...d, badges })}
+            render={(b, update) => <Field label="" value={b} onChange={update} />}
+          />
+          <Field
+            label="이미지 위 카드 — 라벨 (예: Director)"
+            value={d.imageCaption?.label ?? ""}
+            onChange={(v) => onChange({ ...d, imageCaption: { ...d.imageCaption, label: v } })}
+          />
+          <Field
+            label="이미지 위 카드 — 제목 (예: 이기홍 원장)"
+            value={d.imageCaption?.title ?? ""}
+            onChange={(v) => onChange({ ...d, imageCaption: { ...d.imageCaption, title: v } })}
+          />
+          <Select
+            label="이미지 뒤 흐림 장식"
+            value={d.blob ? "on" : "off"}
+            options={[
+              { value: "off", label: "없음" },
+              { value: "on", label: "있음" },
+            ]}
+            onChange={(v) => onChange({ ...d, blob: v === "on" })}
+          />
           <ButtonsEditor buttons={d.buttons ?? []} onChange={(b) => onChange({ ...d, buttons: b })} />
         </div>
       );

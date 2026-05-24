@@ -264,11 +264,26 @@ function TwoColumnBlock({ d }: { d: TwoColumnData }) {
   const imageFirst = d.imageSide === "left";
   const img = (
     <div className="w-full lg:w-1/2 relative">
+      {d.blob && (
+        <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-surface rounded-full blur-3xl opacity-50" />
+      )}
       <img
         className="rounded-3xl shadow-2xl relative z-10 w-full aspect-[4/5] object-cover"
         alt={d.image.alt}
         src={d.image.src}
       />
+      {d.imageCaption && (
+        <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl z-20 border border-neutral-100">
+          {d.imageCaption.label && (
+            <p className="text-xs text-primary font-bold mb-1 uppercase tracking-wider">
+              {d.imageCaption.label}
+            </p>
+          )}
+          {d.imageCaption.title && (
+            <p className="text-xl font-bold text-neutral-900">{d.imageCaption.title}</p>
+          )}
+        </div>
+      )}
     </div>
   );
   const text = (
@@ -289,6 +304,18 @@ function TwoColumnBlock({ d }: { d: TwoColumnData }) {
             </li>
           ))}
         </ul>
+      )}
+      {d.badges && d.badges.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {d.badges.map((b, i) => (
+            <span
+              key={i}
+              className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-full"
+            >
+              {b}
+            </span>
+          ))}
+        </div>
       )}
       {d.buttons && <Buttons buttons={d.buttons} />}
     </div>

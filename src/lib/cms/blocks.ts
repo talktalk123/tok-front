@@ -122,7 +122,14 @@ export interface TwoColumnData {
   paragraphs: string[];
   image: { src: string; alt: string };
   imageSide: "left" | "right";
+  /** 체크리스트(아이콘) */
   list?: string[];
+  /** 배지 칩(이력 등). list와 별개 */
+  badges?: string[];
+  /** 이미지 위 떠있는 카드(예: Director / 이기홍 원장) */
+  imageCaption?: { label?: string; title?: string };
+  /** 이미지 뒤 흐림 장식 */
+  blob?: boolean;
   buttons?: CmsButton[];
 }
 
