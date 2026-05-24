@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import BlockForm from "@/components/admin/cms/BlockForm";
-import BlockRenderer from "@/components/cms/BlockRenderer";
+import BlockRenderer, { RenderBlock } from "@/components/cms/BlockRenderer";
 import {
   BLOCK_REGISTRY,
   BLOCK_LABEL,
@@ -46,6 +46,24 @@ function summarize(type: BlockType, data: Record<string, unknown>): string {
   return s.length > 38 ? `${s.slice(0, 38)}…` : s || "(내용 없음)";
 }
 
+/** 블록 타입 색상 배지 (목록에서 종류 구분) */
+const BLOCK_BADGE: Record<string, string> = {
+  hero: "bg-indigo-50 text-indigo-600 border-indigo-200",
+  "rich-text": "bg-slate-50 text-slate-600 border-slate-200",
+  "card-grid": "bg-amber-50 text-amber-700 border-amber-200",
+  "two-column": "bg-teal-50 text-teal-700 border-teal-200",
+  "process-steps": "bg-blue-50 text-blue-600 border-blue-200",
+  faq: "bg-purple-50 text-purple-600 border-purple-200",
+  cta: "bg-rose-50 text-rose-600 border-rose-200",
+  "text-panel": "bg-cyan-50 text-cyan-700 border-cyan-200",
+  callout: "bg-orange-50 text-orange-600 border-orange-200",
+  table: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "card-list": "bg-lime-50 text-lime-700 border-lime-200",
+  "raw-html": "bg-neutral-100 text-neutral-600 border-neutral-300",
+  "floating-toolbar": "bg-pink-50 text-pink-600 border-pink-200",
+  "info-columns": "bg-sky-50 text-sky-700 border-sky-200",
+};
+
 export default function PageEditor({ page }: { page: AdminPage }) {
   const [blocks, setBlocks] = useState<EditableBlock[]>(
     page.blocks.map((b) => ({
@@ -65,6 +83,13 @@ export default function PageEditor({ page }: { page: AdminPage }) {
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+
+  const showToast = (msg: string, type: "success" | "error" = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const selected = blocks.find((b) => b.id === selectedId) ?? null;
 
@@ -104,10 +129,12 @@ export default function PageEditor({ page }: { page: AdminPage }) {
   const toggleVisible = (id: string) =>
     mutate((prev) => prev.map((b) => (b.id === id ? { ...b, visible: !b.visible } : b)));
 
-  const removeBlock = (id: string) => {
-    if (!confirm("이 블록을 삭제할까요?")) return;
-    mutate((prev) => prev.filter((b) => b.id !== id));
-    if (selectedId === id) setSelectedId(null);
+  const confirmDelete = () => {
+    if (!deleteTargetId) return;
+    mutate((prev) => prev.filter((b) => b.id !== deleteTargetId));
+    if (selectedId === deleteTargetId) setSelectedId(null);
+    setDeleteTargetId(null);
+    showToast("블록이 삭제되었습니다. (저장해야 반영됩니다)");
   };
 
   const handleSave = async () => {
@@ -121,8 +148,11 @@ export default function PageEditor({ page }: { page: AdminPage }) {
       });
       setSavedAt(new Date().toLocaleTimeString("ko-KR"));
       setDirty(false);
+      showToast("저장되었습니다!");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "저장 실패");
+      const msg = e instanceof Error ? e.message : "저장 실패";
+      setError(msg);
+      showToast(msg, "error");
     } finally {
       setSaving(false);
     }
@@ -142,6 +172,17 @@ export default function PageEditor({ page }: { page: AdminPage }) {
       setPreviewH(previewInnerRef.current.scrollHeight);
     }
   }, [mode, blocks]);
+
+  // 선택 블록 실시간 미리보기 (편집 폼 옆)
+  const BP_W = 1280;
+  const BP_SCALE = 0.32;
+  const blockPrevRef = useRef<HTMLDivElement>(null);
+  const [blockPrevH, setBlockPrevH] = useState(0);
+  useLayoutEffect(() => {
+    if (mode === "edit" && selected && blockPrevRef.current) {
+      setBlockPrevH(blockPrevRef.current.scrollHeight);
+    }
+  }, [mode, selectedId, selected?.data, selected]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -227,8 +268,13 @@ export default function PageEditor({ page }: { page: AdminPage }) {
                   onClick={() => setSelectedId(b.id)}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-wide truncate">
-                      {i + 1}. {BLOCK_LABEL[b.type] ?? b.type}
+                    <span className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[10px] font-bold text-neutral-400">{i + 1}</span>
+                      <span
+                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border truncate ${BLOCK_BADGE[b.type] ?? "bg-neutral-100 text-neutral-600 border-neutral-200"}`}
+                      >
+                        {BLOCK_LABEL[b.type] ?? b.type}
+                      </span>
                     </span>
                     <div className="flex items-center gap-0.5 text-neutral-400">
                       <button onClick={(e) => { e.stopPropagation(); move(b.id, -1); }} title="위로">
@@ -242,7 +288,7 @@ export default function PageEditor({ page }: { page: AdminPage }) {
                           {b.visible ? "visibility" : "visibility_off"}
                         </span>
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); removeBlock(b.id); }} title="삭제" className="text-red-400">
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTargetId(b.id); }} title="삭제" className="text-red-400">
                         <span className="material-symbols-outlined text-sm">delete</span>
                       </button>
                     </div>
@@ -323,6 +369,75 @@ export default function PageEditor({ page }: { page: AdminPage }) {
               </div>
             )}
           </main>
+
+          {/* 우: 선택 블록 실시간 미리보기 (넓은 화면) */}
+          {selected && (
+            <aside className="w-[440px] flex-shrink-0 border-l border-neutral-200 bg-neutral-100 hidden xl:flex flex-col">
+              <div className="text-[11px] font-medium text-neutral-500 px-4 py-2 border-b border-neutral-200 bg-white flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">visibility</span>
+                실시간 미리보기 — 이 블록
+              </div>
+              <div className="flex-1 overflow-auto p-4">
+                <div
+                  className="bg-white rounded-lg shadow border border-neutral-300 overflow-hidden mx-auto"
+                  style={{ width: BP_W * BP_SCALE, height: blockPrevH * BP_SCALE || undefined }}
+                >
+                  <div
+                    ref={blockPrevRef}
+                    style={{ width: BP_W, transform: `scale(${BP_SCALE})`, transformOrigin: "top left" }}
+                  >
+                    <RenderBlock
+                      block={{ id: selected.id, type: selected.type, data: selected.data } as unknown as CmsBlock}
+                    />
+                  </div>
+                </div>
+              </div>
+            </aside>
+          )}
+        </div>
+      )}
+
+      {/* 토스트 */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-2 text-sm">
+          <span className={`material-symbols-outlined ${toast.type === "success" ? "text-green-400" : "text-red-400"}`}>
+            {toast.type === "success" ? "check_circle" : "error"}
+          </span>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* 삭제 확인 모달 */}
+      {deleteTargetId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={(e) => { if (e.target === e.currentTarget) setDeleteTargetId(null); }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-600">delete</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-neutral-900">블록을 삭제할까요?</h3>
+                <p className="text-sm text-neutral-500">저장하면 영구 반영됩니다.</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setDeleteTargetId(null)}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
