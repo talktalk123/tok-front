@@ -440,6 +440,15 @@ export default function BlockForm({
           />
           <Field label="하이라이트 아이콘 (체크리스트 비울 때)" value={d.panelIcon ?? ""} onChange={(v) => onChange({ ...d, panelIcon: v })} />
           <Field label="하이라이트 본문 (체크리스트 비울 때)" value={d.panelText ?? ""} textarea onChange={(v) => onChange({ ...d, panelText: v })} />
+          <Select
+            label="하이라이트 색조"
+            value={d.panelTone ?? "primary"}
+            options={[
+              { value: "primary", label: "기본(주황)" },
+              { value: "warning", label: "경고(빨강)" },
+            ]}
+            onChange={(v) => onChange({ ...d, panelTone: v })}
+          />
         </div>
       );
     }
@@ -485,6 +494,15 @@ export default function BlockForm({
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
           <Field label="제목" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
           <Field label="소개 문구" value={d.intro ?? ""} textarea onChange={(v) => onChange({ ...d, intro: v })} />
+          <Select
+            label="표 밀도"
+            value={d.dense ? "dense" : "normal"}
+            options={[
+              { value: "normal", label: "표준" },
+              { value: "dense", label: "밀집(작은 글씨, 행 많을 때)" },
+            ]}
+            onChange={(v) => onChange({ ...d, dense: v === "dense" })}
+          />
           <Repeat<string>
             label="열 제목(헤더)"
             items={d.headers ?? []}
@@ -525,6 +543,15 @@ export default function BlockForm({
             ]}
             onChange={(v) => onChange({ ...d, columns: Number(v) as 2 | 3 })}
           />
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "white"}
+            options={[
+              { value: "white", label: "흰색(카드 연회색)" },
+              { value: "neutral", label: "연회색(카드 흰색)" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v })}
+          />
           <Repeat<CardListItem>
             label="카드"
             items={d.cards ?? []}
@@ -532,6 +559,7 @@ export default function BlockForm({
             onChange={(cards) => onChange({ ...d, cards })}
             render={(c, update) => (
               <>
+                <Field label="번호 (선택, 예: 01)" value={c.num ?? ""} onChange={(v) => update({ ...c, num: v })} />
                 <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
                 <Field label="부제 (선택)" value={c.subtitle ?? ""} onChange={(v) => update({ ...c, subtitle: v })} />
                 <Repeat<string>

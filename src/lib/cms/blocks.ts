@@ -73,6 +73,8 @@ export interface TextPanelData {
   /** 하이라이트 카드 모드 */
   panelIcon?: string;
   panelText?: string;
+  /** 하이라이트 카드 색조 (기본 primary, warning=빨강 경고) */
+  panelTone?: "primary" | "warning";
 }
 
 /** 가운데 정렬 강조 밴드 + 배지 칩 */
@@ -91,12 +93,15 @@ export interface TableData {
   intro?: string;
   /** 섹션 배경 (기본 white) */
   bg?: "white" | "neutral";
+  /** 밀집 표(작은 글씨) */
+  dense?: boolean;
   headers: string[];
   rows: string[][];
 }
 
 /** 제목+불릿 리스트 패널 카드들 (이력/안내 등) */
 export interface CardListItem {
+  num?: string;
   title: string;
   subtitle?: string;
   items: string[];
@@ -106,6 +111,8 @@ export interface CardListData {
   heading?: string;
   intro?: string;
   columns: 2 | 3;
+  /** 섹션 배경 (기본 white). neutral이면 카드가 흰색으로 대비 */
+  bg?: "white" | "neutral";
   cards: CardListItem[];
 }
 

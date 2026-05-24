@@ -72,13 +72,18 @@ function Eyebrow({ text }: { text?: string }) {
 function HeroBlock({ d }: { d: HeroData }) {
   const dark = (d.theme ?? "dark") === "dark";
   const isImage = d.bg?.type === "image";
+  // 이미지 히어로: 70vh 중앙정렬 / 그라데이션 히어로: 위에서부터 짧은 패딩
+  const layoutCls = isImage
+    ? `relative min-h-[70vh] flex items-center overflow-hidden ${dark ? "bg-neutral-900" : ""}`
+    : `relative overflow-hidden pt-32 pb-20 lg:pt-40 lg:pb-28 ${dark ? "bg-neutral-900" : "bg-gradient-to-br from-primary-surface to-white"}`;
   const bgStyle: React.CSSProperties | undefined =
-    isImage || !d.bg?.value ? undefined : { backgroundColor: d.bg.value };
+    !isImage && dark && d.bg?.value ? { backgroundColor: d.bg.value } : undefined;
+  const innerCls = isImage
+    ? "relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
+    : "relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+  const blockCls = isImage ? "max-w-3xl" : "max-w-4xl";
   return (
-    <header
-      className={`relative min-h-[70vh] flex items-center overflow-hidden ${dark ? "bg-neutral-900" : "bg-primary-surface"}`}
-      style={bgStyle}
-    >
+    <header className={layoutCls} style={bgStyle}>
       {isImage && (
         <div className="absolute inset-0 z-0">
           <img
@@ -91,8 +96,8 @@ function HeroBlock({ d }: { d: HeroData }) {
           />
         </div>
       )}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-3xl">
+      <div className={innerCls}>
+        <div className={blockCls}>
           {d.breadcrumb && (
             <p className={`text-sm mb-3 ${dark ? "text-neutral-400" : "text-neutral-500"}`}>
               {d.breadcrumb}
@@ -187,26 +192,38 @@ function CardGridBlock({ d }: { d: CardGridData }) {
         )}
         {d.variant === "number" || d.variant === "number-lg" ? (
           <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
-            {d.cards.map((c, i) => (
-              <div
-                key={i}
-                className={
-                  d.variant === "number-lg"
-                    ? "bg-neutral-50 rounded-2xl p-8 border border-neutral-100 hover:border-primary/40 transition-colors"
-                    : "bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm hover:shadow-md transition-shadow"
-                }
-              >
-                {d.variant === "number-lg" ? (
-                  <div className="text-3xl font-black text-primary mb-3">{c.num ?? String(i + 1)}</div>
-                ) : (
-                  <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center font-bold text-lg mb-4">
-                    {c.num ?? String(i + 1)}
-                  </div>
-                )}
-                <h3 className="text-xl font-bold mb-3 text-neutral-900">{c.title}</h3>
-                <p className="text-neutral-600 leading-relaxed">{c.desc}</p>
-              </div>
-            ))}
+            {d.cards.map((c, i) => {
+              // number-lg: 섹션 배경과 대비되게 카드 색 (white 섹션→회색 카드, neutral 섹션→흰 카드)
+              const lgCard =
+                d.bg === "white"
+                  ? "bg-neutral-50 rounded-2xl p-8 border border-neutral-100 hover:border-primary/40 transition-colors"
+                  : "bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm";
+              const four = d.columns === 4;
+              return (
+                <div
+                  key={i}
+                  className={
+                    d.variant === "number-lg"
+                      ? lgCard
+                      : "bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm hover:shadow-md transition-shadow"
+                  }
+                >
+                  {d.variant === "number-lg" ? (
+                    <div className="text-3xl font-black text-primary mb-3">{c.num ?? String(i + 1)}</div>
+                  ) : (
+                    <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center font-bold text-lg mb-4">
+                      {c.num ?? String(i + 1)}
+                    </div>
+                  )}
+                  <h3 className={`${four ? "text-lg" : "text-xl"} font-bold mb-3 text-neutral-900`}>
+                    {c.title}
+                  </h3>
+                  <p className={`${four ? "text-sm " : ""}text-neutral-600 leading-relaxed`}>
+                    {c.desc}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
@@ -421,10 +438,16 @@ function TextPanelBlock({ d }: { d: TextPanelData }) {
               </ul>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 border-2 border-primary/20 shadow-sm">
+            <div
+              className={`bg-white rounded-3xl p-10 border-2 shadow-sm ${d.panelTone === "warning" ? "border-red-200" : "border-primary/20"}`}
+            >
               <div className="flex items-center gap-3 mb-4">
                 {d.panelIcon && (
-                  <span className="material-symbols-outlined text-primary text-3xl">{d.panelIcon}</span>
+                  <span
+                    className={`material-symbols-outlined text-3xl ${d.panelTone === "warning" ? "text-red-500" : "text-primary"}`}
+                  >
+                    {d.panelIcon}
+                  </span>
                 )}
                 <h3 className="text-xl font-bold text-neutral-900">{d.panelTitle}</h3>
               </div>
@@ -487,7 +510,9 @@ function TableBlock({ d }: { d: TableData }) {
           </div>
         )}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm md:text-base border-collapse bg-white rounded-2xl overflow-hidden shadow-sm border border-neutral-100">
+          <table
+            className={`w-full ${d.dense ? "text-xs md:text-sm" : "text-sm md:text-base"} border-collapse bg-white rounded-2xl overflow-hidden shadow-sm border border-neutral-100`}
+          >
             <thead>
               <tr className="bg-neutral-900 text-white">
                 {d.headers.map((h, i) => (
@@ -526,8 +551,13 @@ function TableBlock({ d }: { d: TableData }) {
 
 function CardListBlock({ d }: { d: CardListData }) {
   const cols = d.columns === 3 ? "md:grid-cols-3" : "md:grid-cols-2";
+  const neutralSection = d.bg === "neutral";
+  // 섹션이 neutral이면 카드는 흰색(대비), white면 카드는 연회색
+  const cardCls = neutralSection
+    ? "bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm"
+    : "bg-neutral-50 rounded-3xl p-10 border border-neutral-100";
   return (
-    <section className="py-24 bg-white">
+    <section className={`py-24 ${neutralSection ? "bg-neutral-50" : "bg-white"}`}>
       <div className={SECTION}>
         {(d.heading || d.eyebrow) && (
           <div className="text-center mb-16">
@@ -540,9 +570,10 @@ function CardListBlock({ d }: { d: CardListData }) {
             )}
           </div>
         )}
-        <div className={`grid ${cols} gap-8`}>
+        <div className={`grid ${cols} gap-6`}>
           {d.cards.map((c, i) => (
-            <div key={i} className="bg-neutral-50 rounded-3xl p-10 border border-neutral-100">
+            <div key={i} className={cardCls}>
+              {c.num && <div className="text-4xl font-black text-primary mb-4">{c.num}</div>}
               <h3 className={`text-xl font-bold text-neutral-900 ${c.subtitle ? "mb-3" : "mb-6"}`}>
                 {c.title}
               </h3>
@@ -550,12 +581,19 @@ function CardListBlock({ d }: { d: CardListData }) {
                 <p className="text-xs text-neutral-500 mb-6 leading-relaxed">{c.subtitle}</p>
               )}
               <ul className="space-y-3">
-                {c.items?.map((item, j) => (
-                  <li key={j} className="flex gap-3 text-neutral-700">
-                    <span className="text-primary font-bold">·</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
+                {c.items?.map((item, j) =>
+                  c.num ? (
+                    <li key={j} className="flex gap-2 text-sm text-neutral-600 leading-relaxed">
+                      <span className="text-primary flex-shrink-0">·</span>
+                      <span>{item}</span>
+                    </li>
+                  ) : (
+                    <li key={j} className="flex gap-3 text-neutral-700">
+                      <span className="text-primary font-bold">·</span>
+                      <span>{item}</span>
+                    </li>
+                  ),
+                )}
               </ul>
             </div>
           ))}
