@@ -64,7 +64,10 @@ admin에서 블록 단위로 추가·수정·순서변경·표시토글하며, �
 | `cta` | 강조 배너(전화/예약 등) | `heading`, `text?`, `buttons[]`, `theme` |
 
 `buttons[]` 항목: `{ label, href, style: "primary" | "outline" }`
-`bg`: `{ type: "color" | "image", value }` (color=Tailwind/hex, image=경로)
+`bg`: `{ type: "color" | "image", value }`
+  - color일 때 `value`는 **CSS 색상값**(예: `#171717`, `rgb(...)`). 인라인 style로 적용한다.
+    → Tailwind 클래스(`bg-...`)는 빌드 시 소스에 없으면 생성되지 않으므로 쓰지 않는다.
+  - image일 때 `value`는 이미지 경로(`/images/..`).
 
 타입 정의의 정확한 형태는 `src/lib/cms/blocks.ts`가 기준이다 (이 표는 요약).
 
@@ -127,11 +130,28 @@ admin에서 블록 단위로 추가·수정·순서변경·표시토글하며, �
 
 ---
 
-## 7. 진행 현황 (마이그레이션 체크리스트)
+## 7. 배포 순서 (하드 요구사항)
 
-- [ ] 백엔드: ContentModule 등록 + 공개 읽기 + 일괄 저장 + `page_contents.updated_at`
-- [ ] SQL: `pages` seed + `ALTER`
-- [ ] 프론트 기반: 블록 타입/렌더러/서버 로더/revalidate
-- [ ] admin: 페이지 목록 + 에디터(미리보기) + 사이드바
-- [ ] 페이지 전환: about → home → medicine → chuna → beauty → car-accident → how-to-come → faq
+> **SQL → 백엔드 → 프론트** 순서를 반드시 지킨다.
+
+1. **SQL 먼저**: `tok-backend/prisma/cms-seed.sql`을 Supabase에서 실행.
+   - 이유: `schema.prisma`에 `PageContent.updated_at`이 추가됐다. Prisma 클라이언트는 모든 스키마 컬럼을 SELECT하므로, **컬럼이 없는 상태로 백엔드가 조회하면 런타임 에러**가 난다. 순서는 권장이 아니라 필수.
+2. **백엔드 배포**: `tok-backend`에서 `vercel --prod` (이 프로젝트는 git이 아니라 CLI로 배포해 옴). `vercel-build`가 `prisma generate`를 돌려 `updated_at`을 반영.
+3. **프론트 배포**: `git push` (tok-front 자동 배포).
+
+### 검증 시퀀스 (프론트 push 전에)
+1. SQL 실행 → 2. 백엔드 배포 → 3. admin → 페이지 관리 → about → rich-text 블록 1개 추가 → 미리보기 → 저장 → 4. `/about`가 그 블록으로 렌더되는지 확인(폴백 아님) → 5. 확인되면 나머지 페이지 배선/이식.
+
+## 8. 진행 현황 (마이그레이션 체크리스트)
+
+- [x] 백엔드: ContentModule 등록 + 공개 읽기 + 일괄 저장 + `page_contents.updated_at`
+- [x] SQL: `pages` seed + `ALTER` (`prisma/cms-seed.sql`)
+- [x] 프론트 기반: 블록 타입/렌더러/서버 로더/revalidate
+- [x] admin: 페이지 목록 + 에디터(미리보기) + 사이드바
+- [x] 페이지 전환: **about**(레퍼런스, 폴백 포함) ← 완료
+- [ ] 페이지 전환: home → medicine → chuna → beauty → car-accident → how-to-come → faq
+- [ ] 각 페이지 콘텐츠를 블록으로 이식(필요 시 블록 타입 확장) + 미리보기 검수
 - [ ] 각 전환 페이지 `sitemap.ts`/메타 반영
+
+### 알려진 후속 개선
+- `Repeat<T>` 편집기가 배열 index를 React key로 사용 → 항목 재정렬 시 포커스 튐. 안정 id 부여 예정(비차단).

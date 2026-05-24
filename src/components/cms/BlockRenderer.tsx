@@ -3,6 +3,7 @@
  * 전부 Server Component 호환(여기에 "use client" 없음). FAQ는 native <details>라 JS 불필요.
  */
 import Link from "next/link";
+import FAQSchema from "@/components/FAQSchema";
 import type {
   CmsBlock,
   CmsButton,
@@ -54,12 +55,16 @@ function Eyebrow({ text }: { text?: string }) {
 
 function HeroBlock({ d }: { d: HeroData }) {
   const isImage = d.bg?.type === "image";
-  const bgClass = !isImage ? d.bg?.value || "bg-neutral-900" : "";
-  const style = isImage
-    ? { backgroundImage: `url(${d.bg.value})`, backgroundSize: "cover", backgroundPosition: "center" }
-    : undefined;
+  // 색상은 인라인 style(CSS 색상값)로 — admin이 입력한 임의 색을 Tailwind 빌드 없이 적용
+  const style: React.CSSProperties = isImage
+    ? {
+        backgroundImage: `url(${d.bg.value})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : { backgroundColor: d.bg?.value || "#171717" };
   return (
-    <section className={`relative py-28 text-white ${bgClass}`} style={style}>
+    <section className="relative py-28 text-white" style={style}>
       {isImage && <div className="absolute inset-0 bg-black/50" />}
       <div className={`${SECTION} relative`}>
         <Eyebrow text={d.eyebrow} />
@@ -242,6 +247,8 @@ function FaqBlock({ d }: { d: FaqData }) {
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">{d.heading}</h2>
           )}
         </div>
+        {/* 검색엔진/AI용 FAQ 구조화 데이터 (시각 렌더와 별개) */}
+        <FAQSchema items={d.items} />
         <div className="space-y-4">
           {d.items.map((item, i) => (
             <details

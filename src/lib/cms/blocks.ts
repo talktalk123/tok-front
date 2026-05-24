@@ -148,7 +148,7 @@ export function createDefaultBlockData(type: BlockType): BlockDataMap[BlockType]
         eyebrow: "",
         title: "제목을 입력하세요",
         subtitle: "",
-        bg: { type: "color", value: "bg-neutral-900" },
+        bg: { type: "color", value: "#171717" },
         buttons: [],
       } satisfies HeroData;
     case "rich-text":

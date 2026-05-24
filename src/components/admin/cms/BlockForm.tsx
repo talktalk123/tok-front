@@ -199,13 +199,13 @@ export default function BlockForm({
             label="배경 종류"
             value={d.bg?.type ?? "color"}
             options={[
-              { value: "color", label: "색상 (Tailwind 클래스)" },
+              { value: "color", label: "색상" },
               { value: "image", label: "이미지 (경로)" },
             ]}
             onChange={(v) => onChange({ ...d, bg: { ...d.bg, type: v } })}
           />
           <Field
-            label={d.bg?.type === "image" ? "이미지 경로 (/images/..)" : "배경 클래스 (예: bg-neutral-900)"}
+            label={d.bg?.type === "image" ? "이미지 경로 (/images/..)" : "배경 색상 (예: #171717)"}
             value={d.bg?.value ?? ""}
             onChange={(v) => onChange({ ...d, bg: { ...d.bg, value: v } })}
           />
