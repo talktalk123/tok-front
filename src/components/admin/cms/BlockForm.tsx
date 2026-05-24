@@ -13,6 +13,11 @@ import type {
   FaqData,
   FaqItem,
   CtaData,
+  TextPanelData,
+  CalloutData,
+  TableData,
+  CardListData,
+  CardListItem,
 } from "@/lib/cms/blocks";
 
 /* ── 공통 필드 ─────────────────────────────────────────── */
@@ -161,6 +166,7 @@ function ButtonsEditor({
         <>
           <Field label="라벨" value={b.label} onChange={(v) => update({ ...b, label: v })} />
           <Field label="링크 (href / tel:)" value={b.href} onChange={(v) => update({ ...b, href: v })} />
+          <Field label="아이콘 (선택, material명)" value={b.icon ?? ""} onChange={(v) => update({ ...b, icon: v })} />
           <Select
             label="스타일"
             value={b.style}
@@ -192,9 +198,20 @@ export default function BlockForm({
       const d = data as HeroData;
       return (
         <div className="space-y-3">
+          <Field label="브레드크럼 (예: 홈 > 한약 진료)" value={d.breadcrumb ?? ""} onChange={(v) => onChange({ ...d, breadcrumb: v })} />
+          <Field label="배지 (둥근 라벨, 예: Herbal Medicine)" value={d.badge ?? ""} onChange={(v) => onChange({ ...d, badge: v })} />
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
-          <Field label="제목" value={d.title} onChange={(v) => onChange({ ...d, title: v })} />
-          <Field label="부제" value={d.subtitle ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle: v })} />
+          <Field label="제목 (HTML 허용: <br/>, <span class='text-primary'>)" value={d.title} textarea onChange={(v) => onChange({ ...d, title: v })} />
+          <Field label="부제 (HTML 허용)" value={d.subtitle ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle: v })} />
+          <Select
+            label="테마"
+            value={d.theme ?? "dark"}
+            options={[
+              { value: "dark", label: "어두운 배경(흰 글씨)" },
+              { value: "light", label: "밝은 배경(검은 글씨)" },
+            ]}
+            onChange={(v) => onChange({ ...d, theme: v })}
+          />
           <Select
             label="배경 종류"
             value={d.bg?.type ?? "color"}
@@ -205,9 +222,16 @@ export default function BlockForm({
             onChange={(v) => onChange({ ...d, bg: { ...d.bg, type: v } })}
           />
           <Field
-            label={d.bg?.type === "image" ? "이미지 경로 (/images/..)" : "배경 색상 (예: #171717)"}
+            label={d.bg?.type === "image" ? "이미지 경로/URL" : "배경 색상 (예: #171717)"}
             value={d.bg?.value ?? ""}
             onChange={(v) => onChange({ ...d, bg: { ...d.bg, value: v } })}
+          />
+          <Repeat<string>
+            label="태그 칩"
+            items={d.tags ?? []}
+            makeNew={() => ""}
+            onChange={(tags) => onChange({ ...d, tags })}
+            render={(t, update) => <Field label="" value={t} onChange={update} />}
           />
           <ButtonsEditor buttons={d.buttons ?? []} onChange={(b) => onChange({ ...d, buttons: b })} />
         </div>
@@ -231,6 +255,15 @@ export default function BlockForm({
           <Field label="제목" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
           <Field label="소개 문구" value={d.intro ?? ""} textarea onChange={(v) => onChange({ ...d, intro: v })} />
           <Select
+            label="카드 모양"
+            value={d.variant ?? "icon"}
+            options={[
+              { value: "icon", label: "아이콘 카드(가운데)" },
+              { value: "number", label: "번호 카드(왼쪽)" },
+            ]}
+            onChange={(v) => onChange({ ...d, variant: v })}
+          />
+          <Select
             label="열 개수"
             value={String(d.columns) as "2" | "3" | "4"}
             options={[
@@ -245,14 +278,22 @@ export default function BlockForm({
             items={d.cards ?? []}
             makeNew={() => ({ icon: "check_circle", title: "카드 제목", desc: "설명" })}
             onChange={(cards) => onChange({ ...d, cards })}
-            render={(c, update) => (
-              <>
-                <Field label="아이콘 (material icon명)" value={c.icon} onChange={(v) => update({ ...c, icon: v })} />
-                <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
-                <Field label="설명" value={c.desc} textarea onChange={(v) => update({ ...c, desc: v })} />
-                <Field label="링크 (선택)" value={c.href ?? ""} onChange={(v) => update({ ...c, href: v })} />
-              </>
-            )}
+            render={(c, update) =>
+              d.variant === "number" ? (
+                <>
+                  <Field label="번호" value={c.num ?? ""} onChange={(v) => update({ ...c, num: v })} />
+                  <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
+                  <Field label="설명" value={c.desc} textarea onChange={(v) => update({ ...c, desc: v })} />
+                </>
+              ) : (
+                <>
+                  <Field label="아이콘 (material icon명)" value={c.icon} onChange={(v) => update({ ...c, icon: v })} />
+                  <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
+                  <Field label="설명" value={c.desc} textarea onChange={(v) => update({ ...c, desc: v })} />
+                  <Field label="링크 (선택)" value={c.href ?? ""} onChange={(v) => update({ ...c, href: v })} />
+                </>
+              )
+            }
           />
         </div>
       );
@@ -352,6 +393,126 @@ export default function BlockForm({
             onChange={(v) => onChange({ ...d, theme: v })}
           />
           <ButtonsEditor buttons={d.buttons ?? []} onChange={(b) => onChange({ ...d, buttons: b })} />
+        </div>
+      );
+    }
+    case "text-panel": {
+      const d = data as TextPanelData;
+      return (
+        <div className="space-y-3">
+          <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
+          <Field label="제목 (HTML 허용)" value={d.heading} textarea onChange={(v) => onChange({ ...d, heading: v })} />
+          <Repeat<string>
+            label="문단"
+            items={d.paragraphs ?? []}
+            makeNew={() => ""}
+            onChange={(paragraphs) => onChange({ ...d, paragraphs })}
+            render={(p, update) => <Field label="" value={p} textarea onChange={update} />}
+          />
+          <Field label="강조 인용구 (선택)" value={d.quote ?? ""} textarea onChange={(v) => onChange({ ...d, quote: v })} />
+          <Field label="우측 패널 제목" value={d.panelTitle} onChange={(v) => onChange({ ...d, panelTitle: v })} />
+          <Repeat<string>
+            label="우측 패널 항목 (체크리스트)"
+            items={d.panelItems ?? []}
+            makeNew={() => ""}
+            onChange={(panelItems) => onChange({ ...d, panelItems })}
+            render={(it, update) => <Field label="" value={it} onChange={update} />}
+          />
+        </div>
+      );
+    }
+    case "callout": {
+      const d = data as CalloutData;
+      return (
+        <div className="space-y-3">
+          <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
+          <Field label="제목 (HTML 허용)" value={d.heading} textarea onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="설명" value={d.text ?? ""} textarea onChange={(v) => onChange({ ...d, text: v })} />
+          <Select
+            label="배경"
+            value={d.theme ?? "surface"}
+            options={[
+              { value: "surface", label: "연한 강조(primary-surface)" },
+              { value: "dark", label: "어두운 배경" },
+            ]}
+            onChange={(v) => onChange({ ...d, theme: v })}
+          />
+          <Repeat<string>
+            label="배지 칩"
+            items={d.badges ?? []}
+            makeNew={() => ""}
+            onChange={(badges) => onChange({ ...d, badges })}
+            render={(b, update) => <Field label="" value={b} onChange={update} />}
+          />
+        </div>
+      );
+    }
+    case "table": {
+      const d = data as TableData;
+      return (
+        <div className="space-y-3">
+          <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
+          <Field label="제목" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="소개 문구" value={d.intro ?? ""} textarea onChange={(v) => onChange({ ...d, intro: v })} />
+          <Repeat<string>
+            label="열 제목(헤더)"
+            items={d.headers ?? []}
+            makeNew={() => ""}
+            onChange={(headers) => onChange({ ...d, headers })}
+            render={(h, update) => <Field label="" value={h} onChange={update} />}
+          />
+          <Repeat<string[]>
+            label="행 (셀은 | 로 구분)"
+            items={d.rows ?? []}
+            makeNew={() => d.headers.map(() => "")}
+            onChange={(rows) => onChange({ ...d, rows })}
+            render={(row, update) => (
+              <Field
+                label=""
+                value={row.join(" | ")}
+                textarea
+                onChange={(v) => update(v.split("|").map((c) => c.trim()))}
+              />
+            )}
+          />
+        </div>
+      );
+    }
+    case "card-list": {
+      const d = data as CardListData;
+      return (
+        <div className="space-y-3">
+          <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
+          <Field label="제목" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="소개 문구" value={d.intro ?? ""} textarea onChange={(v) => onChange({ ...d, intro: v })} />
+          <Select
+            label="열 개수"
+            value={String(d.columns) as "2" | "3"}
+            options={[
+              { value: "2", label: "2열" },
+              { value: "3", label: "3열" },
+            ]}
+            onChange={(v) => onChange({ ...d, columns: Number(v) as 2 | 3 })}
+          />
+          <Repeat<CardListItem>
+            label="카드"
+            items={d.cards ?? []}
+            makeNew={() => ({ title: "카드 제목", items: ["항목"] })}
+            onChange={(cards) => onChange({ ...d, cards })}
+            render={(c, update) => (
+              <>
+                <Field label="제목" value={c.title} onChange={(v) => update({ ...c, title: v })} />
+                <Field label="부제 (선택)" value={c.subtitle ?? ""} onChange={(v) => update({ ...c, subtitle: v })} />
+                <Repeat<string>
+                  label="항목"
+                  items={c.items ?? []}
+                  makeNew={() => ""}
+                  onChange={(items) => update({ ...c, items })}
+                  render={(it, up) => <Field label="" value={it} onChange={up} />}
+                />
+              </>
+            )}
+          />
         </div>
       );
     }

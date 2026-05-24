@@ -14,6 +14,10 @@ import type {
   ProcessStepsData,
   FaqData,
   CtaData,
+  TextPanelData,
+  CalloutData,
+  TableData,
+  CardListData,
 } from "@/lib/cms/blocks";
 
 const SECTION = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
@@ -23,20 +27,32 @@ function Buttons({ buttons, onDark }: { buttons: CmsButton[]; onDark?: boolean }
   return (
     <div className="flex flex-wrap gap-3">
       {buttons.map((b, i) => {
-        const isTel = b.href?.startsWith("tel:") || b.href?.startsWith("http");
+        const external = b.href?.startsWith("http");
+        const isTel = b.href?.startsWith("tel:") || external;
         const cls =
           b.style === "primary"
             ? "px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold transition-all flex items-center gap-2"
             : onDark
               ? "px-6 py-3 border border-white/30 rounded-lg hover:bg-white hover:text-neutral-900 transition-all font-bold flex items-center gap-2"
               : "px-6 py-3 border border-neutral-300 rounded-lg hover:border-primary hover:text-primary transition-all font-bold flex items-center gap-2";
-        return isTel ? (
-          <a key={i} href={b.href} className={cls}>
+        const inner = (
+          <>
             {b.label}
+            {b.icon && <span className="material-symbols-outlined">{b.icon}</span>}
+          </>
+        );
+        return isTel ? (
+          <a
+            key={i}
+            href={b.href}
+            {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+            className={cls}
+          >
+            {inner}
           </a>
         ) : (
           <Link key={i} href={b.href} className={cls}>
-            {b.label}
+            {inner}
           </Link>
         );
       })}
@@ -54,29 +70,66 @@ function Eyebrow({ text }: { text?: string }) {
 }
 
 function HeroBlock({ d }: { d: HeroData }) {
+  const dark = (d.theme ?? "dark") === "dark";
   const isImage = d.bg?.type === "image";
-  // 색상은 인라인 style(CSS 색상값)로 — admin이 입력한 임의 색을 Tailwind 빌드 없이 적용
-  const style: React.CSSProperties = isImage
-    ? {
-        backgroundImage: `url(${d.bg.value})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
-    : { backgroundColor: d.bg?.value || "#171717" };
+  const bgStyle: React.CSSProperties | undefined =
+    isImage || !d.bg?.value ? undefined : { backgroundColor: d.bg.value };
   return (
-    <section className="relative py-28 text-white" style={style}>
-      {isImage && <div className="absolute inset-0 bg-black/50" />}
-      <div className={`${SECTION} relative`}>
-        <Eyebrow text={d.eyebrow} />
-        <h1 className="text-4xl md:text-6xl font-black leading-tight mb-6">{d.title}</h1>
-        {d.subtitle && (
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed mb-8">
-            {d.subtitle}
-          </p>
-        )}
-        <Buttons buttons={d.buttons} onDark />
+    <header
+      className={`relative min-h-[70vh] flex items-center overflow-hidden ${dark ? "bg-neutral-900" : "bg-primary-surface"}`}
+      style={bgStyle}
+    >
+      {isImage && (
+        <div className="absolute inset-0 z-0">
+          <img alt="" className="w-full h-full object-cover opacity-60 scale-105" src={d.bg.value} />
+          <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-neutral-900/40 to-transparent" />
+        </div>
+      )}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="max-w-3xl">
+          {d.breadcrumb && (
+            <p className={`text-sm mb-3 ${dark ? "text-neutral-400" : "text-neutral-500"}`}>
+              {d.breadcrumb}
+            </p>
+          )}
+          {d.badge && (
+            <span className="inline-block px-4 py-1.5 bg-primary/20 border border-primary/30 text-primary-300 rounded-full text-sm font-semibold mb-6">
+              {d.badge}
+            </span>
+          )}
+          {d.eyebrow && (
+            <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">{d.eyebrow}</p>
+          )}
+          <h1
+            className={`text-4xl md:text-6xl font-bold mb-8 leading-tight ${dark ? "text-white" : "text-neutral-900"}`}
+            dangerouslySetInnerHTML={{ __html: d.title }}
+          />
+          {d.subtitle && (
+            <p
+              className={`text-lg md:text-xl leading-relaxed mb-10 ${dark ? "text-neutral-300" : "text-neutral-600"}`}
+              dangerouslySetInnerHTML={{ __html: d.subtitle }}
+            />
+          )}
+          {d.tags && d.tags.length > 0 && (
+            <div className="flex flex-wrap gap-3 mb-10">
+              {d.tags.map((t, i) => (
+                <span
+                  key={i}
+                  className={
+                    dark
+                      ? "px-3 py-1.5 bg-white/10 backdrop-blur border border-white/20 text-white text-xs font-semibold rounded-full"
+                      : "px-3 py-1.5 bg-white border border-primary/20 text-primary text-xs font-semibold rounded-full"
+                  }
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          <Buttons buttons={d.buttons} onDark={dark} />
+        </div>
       </div>
-    </section>
+    </header>
   );
 }
 
@@ -120,10 +173,25 @@ function CardGridBlock({ d }: { d: CardGridData }) {
             )}
           </div>
         )}
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
-          {d.cards.map((c, i) => {
-            const inner = (
-              <>
+        {d.variant === "number" ? (
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
+            {d.cards.map((c, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center font-bold text-lg mb-4">
+                  {c.num ?? String(i + 1)}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-neutral-900">{c.title}</h3>
+                <p className="text-neutral-600 leading-relaxed">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
+            {d.cards.map((c, i) => {
+              const inner = (
                 <div className="flex flex-col items-center w-full">
                   <div className="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
                     <span className="material-icons text-primary group-hover:text-white text-4xl">
@@ -135,21 +203,21 @@ function CardGridBlock({ d }: { d: CardGridData }) {
                   </h3>
                   <p className="text-stone-500 text-xs leading-relaxed">{c.desc}</p>
                 </div>
-              </>
-            );
-            const cls =
-              "group relative bg-white p-6 rounded-[2rem] border-2 border-stone-50 card-button-shadow hover:border-primary/40 transition-all duration-300 flex flex-col items-center text-center justify-between";
-            return c.href ? (
-              <Link key={i} href={c.href} className={cls}>
-                {inner}
-              </Link>
-            ) : (
-              <div key={i} className={cls}>
-                {inner}
-              </div>
-            );
-          })}
-        </div>
+              );
+              const cls =
+                "group relative bg-white p-6 rounded-[2rem] border-2 border-stone-50 card-button-shadow hover:border-primary/40 transition-all duration-300 flex flex-col items-center text-center justify-between";
+              return c.href ? (
+                <Link key={i} href={c.href} className={cls}>
+                  {inner}
+                </Link>
+              ) : (
+                <div key={i} className={cls}>
+                  {inner}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -293,6 +361,175 @@ function CtaBlock({ d }: { d: CtaData }) {
   );
 }
 
+function TextPanelBlock({ d }: { d: TextPanelData }) {
+  return (
+    <section className="py-24 bg-white">
+      <div className={SECTION}>
+        <div className="grid lg:grid-cols-2 gap-12">
+          <div>
+            <Eyebrow text={d.eyebrow} />
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-6 leading-tight"
+              dangerouslySetInnerHTML={{ __html: d.heading }}
+            />
+            {d.paragraphs?.map((p, i) => (
+              <p key={i} className="text-neutral-600 leading-relaxed mb-5">
+                {p}
+              </p>
+            ))}
+            {d.quote && (
+              <p className="text-base text-neutral-700 leading-relaxed bg-primary-surface p-6 rounded-2xl border-l-4 border-primary">
+                {d.quote}
+              </p>
+            )}
+          </div>
+          <div className="bg-neutral-50 rounded-3xl p-10 border border-neutral-100">
+            <h3 className="text-xl font-bold mb-6 text-neutral-900">{d.panelTitle}</h3>
+            <ul className="space-y-4">
+              {d.panelItems?.map((item, i) => (
+                <li key={i} className="flex gap-3 text-neutral-700 leading-relaxed">
+                  <span className="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">
+                    check_circle
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CalloutBlock({ d }: { d: CalloutData }) {
+  const dark = d.theme === "dark";
+  return (
+    <section className={`py-20 ${dark ? "bg-neutral-900 text-white" : "bg-primary-surface"}`}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <Eyebrow text={d.eyebrow} />
+        <h2
+          className={`text-2xl md:text-4xl font-bold mb-6 leading-tight ${dark ? "text-white" : "text-neutral-900"}`}
+          dangerouslySetInnerHTML={{ __html: d.heading }}
+        />
+        {d.text && (
+          <p
+            className={`leading-relaxed mb-8 max-w-3xl mx-auto ${dark ? "text-neutral-300" : "text-neutral-600"}`}
+          >
+            {d.text}
+          </p>
+        )}
+        {d.badges && d.badges.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-center">
+            {d.badges.map((b, i) => (
+              <span
+                key={i}
+                className="px-4 py-2 bg-white text-primary text-sm font-bold rounded-full border border-primary/20"
+              >
+                {b}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function TableBlock({ d }: { d: TableData }) {
+  return (
+    <section className="py-24 bg-white">
+      <div className={SECTION}>
+        {(d.heading || d.eyebrow) && (
+          <div className="text-center mb-16">
+            <Eyebrow text={d.eyebrow} />
+            {d.heading && (
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">{d.heading}</h2>
+            )}
+            {d.intro && (
+              <p className="text-neutral-500 max-w-3xl mx-auto leading-relaxed">{d.intro}</p>
+            )}
+          </div>
+        )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm md:text-base border-collapse bg-white rounded-2xl overflow-hidden shadow-sm border border-neutral-100">
+            <thead>
+              <tr className="bg-neutral-900 text-white">
+                {d.headers.map((h, i) => (
+                  <th key={i} className="p-4 text-left font-bold">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {d.rows.map((row, ri) => (
+                <tr key={ri} className="border-t border-neutral-100 hover:bg-neutral-50 transition-colors">
+                  {row.map((cell, ci) => (
+                    <td
+                      key={ci}
+                      className={
+                        ci === 0
+                          ? "p-4 font-bold text-primary"
+                          : ci === 1
+                            ? "p-4 text-neutral-700"
+                            : "p-4 text-neutral-600"
+                      }
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CardListBlock({ d }: { d: CardListData }) {
+  const cols = d.columns === 3 ? "md:grid-cols-3" : "md:grid-cols-2";
+  return (
+    <section className="py-24 bg-white">
+      <div className={SECTION}>
+        {(d.heading || d.eyebrow) && (
+          <div className="text-center mb-16">
+            <Eyebrow text={d.eyebrow} />
+            {d.heading && (
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">{d.heading}</h2>
+            )}
+            {d.intro && (
+              <p className="text-neutral-500 max-w-3xl mx-auto leading-relaxed">{d.intro}</p>
+            )}
+          </div>
+        )}
+        <div className={`grid ${cols} gap-8`}>
+          {d.cards.map((c, i) => (
+            <div key={i} className="bg-neutral-50 rounded-3xl p-10 border border-neutral-100">
+              <h3 className={`text-xl font-bold text-neutral-900 ${c.subtitle ? "mb-3" : "mb-6"}`}>
+                {c.title}
+              </h3>
+              {c.subtitle && (
+                <p className="text-xs text-neutral-500 mb-6 leading-relaxed">{c.subtitle}</p>
+              )}
+              <ul className="space-y-3">
+                {c.items?.map((item, j) => (
+                  <li key={j} className="flex gap-3 text-neutral-700">
+                    <span className="text-primary font-bold">·</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** 단일 블록 렌더 */
 export function RenderBlock({ block }: { block: CmsBlock }) {
   switch (block.type) {
@@ -310,6 +547,14 @@ export function RenderBlock({ block }: { block: CmsBlock }) {
       return <FaqBlock d={block.data as FaqData} />;
     case "cta":
       return <CtaBlock d={block.data as CtaData} />;
+    case "text-panel":
+      return <TextPanelBlock d={block.data as TextPanelData} />;
+    case "callout":
+      return <CalloutBlock d={block.data as CalloutData} />;
+    case "table":
+      return <TableBlock d={block.data as TableData} />;
+    case "card-list":
+      return <CardListBlock d={block.data as CardListData} />;
     default:
       return null;
   }

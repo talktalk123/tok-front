@@ -11,13 +11,21 @@ export interface CmsButton {
   label: string;
   href: string;
   style: ButtonStyle;
+  /** material symbol 이름 (선택). 라벨 뒤/앞에 표시 */
+  icon?: string;
 }
 
 export interface HeroData {
   eyebrow?: string;
+  breadcrumb?: string;
+  badge?: string;
+  /** HTML 허용 (제목 내 <br/>, <span class="text-primary"> 등 보존) */
   title: string;
   subtitle?: string;
   bg: { type: "color" | "image"; value: string };
+  /** 어두운 배경(흰 글씨) / 밝은 배경(검은 글씨) */
+  theme?: "dark" | "light";
+  tags?: string[];
   buttons: CmsButton[];
 }
 
@@ -29,7 +37,8 @@ export interface RichTextData {
 }
 
 export interface CardItem {
-  icon: string; // material symbol name
+  icon: string; // material symbol name (variant=icon일 때)
+  num?: string; // 번호 배지 (variant=number일 때)
   title: string;
   desc: string;
   href?: string;
@@ -39,7 +48,52 @@ export interface CardGridData {
   heading?: string;
   intro?: string;
   columns: 2 | 3 | 4;
+  /** icon=아이콘 원형 배지, number=번호 사각 배지 */
+  variant?: "icon" | "number";
   cards: CardItem[];
+}
+
+/** 좌(텍스트+인용구) / 우(패널: 제목+체크리스트) 2단 */
+export interface TextPanelData {
+  eyebrow?: string;
+  heading: string;
+  paragraphs: string[];
+  /** 강조 인용구 박스(좌측 하단). 비우면 표시 안 함 */
+  quote?: string;
+  panelTitle: string;
+  panelItems: string[];
+}
+
+/** 가운데 정렬 강조 밴드 + 배지 칩 */
+export interface CalloutData {
+  eyebrow?: string;
+  heading: string;
+  text?: string;
+  badges?: string[];
+  theme?: "surface" | "dark";
+}
+
+/** 표 */
+export interface TableData {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  headers: string[];
+  rows: string[][];
+}
+
+/** 제목+불릿 리스트 패널 카드들 (이력/안내 등) */
+export interface CardListItem {
+  title: string;
+  subtitle?: string;
+  items: string[];
+}
+export interface CardListData {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  columns: 2 | 3;
+  cards: CardListItem[];
 }
 
 export interface TwoColumnData {
@@ -88,7 +142,11 @@ export type BlockType =
   | "two-column"
   | "process-steps"
   | "faq"
-  | "cta";
+  | "cta"
+  | "text-panel"
+  | "callout"
+  | "table"
+  | "card-list";
 
 export interface BlockDataMap {
   hero: HeroData;
@@ -98,6 +156,10 @@ export interface BlockDataMap {
   "process-steps": ProcessStepsData;
   faq: FaqData;
   cta: CtaData;
+  "text-panel": TextPanelData;
+  callout: CalloutData;
+  table: TableData;
+  "card-list": CardListData;
 }
 
 /** 공개/편집 공통 블록. visible 은 admin 편집 시에만 의미. */
@@ -134,6 +196,10 @@ export const BLOCK_REGISTRY: ReadonlyArray<{
   { type: "process-steps", label: "단계 안내", icon: "format_list_numbered" },
   { type: "faq", label: "FAQ 아코디언", icon: "quiz" },
   { type: "cta", label: "강조 배너 (CTA)", icon: "campaign" },
+  { type: "text-panel", label: "텍스트 + 체크리스트 패널", icon: "vertical_split" },
+  { type: "callout", label: "강조 밴드 (가운데)", icon: "ad_units" },
+  { type: "table", label: "표", icon: "table" },
+  { type: "card-list", label: "리스트 카드", icon: "list_alt" },
 ];
 
 export const BLOCK_LABEL: Record<BlockType, string> = Object.fromEntries(
@@ -195,5 +261,38 @@ export function createDefaultBlockData(type: BlockType): BlockDataMap[BlockType]
         buttons: [{ label: "전화 문의", href: "tel:031-767-0075", style: "primary" }],
         theme: "dark",
       } satisfies CtaData;
+    case "text-panel":
+      return {
+        eyebrow: "",
+        heading: "제목",
+        paragraphs: ["문단 내용을 입력하세요."],
+        quote: "",
+        panelTitle: "패널 제목",
+        panelItems: ["항목 1", "항목 2"],
+      } satisfies TextPanelData;
+    case "callout":
+      return {
+        eyebrow: "",
+        heading: "강조 문구",
+        text: "",
+        badges: [],
+        theme: "surface",
+      } satisfies CalloutData;
+    case "table":
+      return {
+        eyebrow: "",
+        heading: "표 제목",
+        intro: "",
+        headers: ["구분", "설명"],
+        rows: [["항목", "내용"]],
+      } satisfies TableData;
+    case "card-list":
+      return {
+        eyebrow: "",
+        heading: "",
+        intro: "",
+        columns: 2,
+        cards: [{ title: "카드 제목", items: ["항목 1", "항목 2"] }],
+      } satisfies CardListData;
   }
 }
