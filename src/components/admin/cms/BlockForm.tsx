@@ -18,6 +18,8 @@ import type {
   TableData,
   CardListData,
   CardListItem,
+  RawHtmlData,
+  FloatingToolbarData,
 } from "@/lib/cms/blocks";
 
 /* ── 공통 필드 ─────────────────────────────────────────── */
@@ -203,6 +205,8 @@ export default function BlockForm({
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
           <Field label="제목 (HTML 허용: <br/>, <span class='text-primary'>)" value={d.title} textarea onChange={(v) => onChange({ ...d, title: v })} />
           <Field label="부제 (HTML 허용)" value={d.subtitle ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle: v })} />
+          <Field label="보조 부제 (선택, HTML 허용)" value={d.subtitle2 ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle2: v })} />
+          <Field label="흐린 배경 이미지 (선택, 밝은 그라데이션 히어로용)" value={d.bgImage ?? ""} onChange={(v) => onChange({ ...d, bgImage: v })} />
           <Select
             label="테마"
             value={d.theme ?? "dark"}
@@ -364,6 +368,38 @@ export default function BlockForm({
               { value: "on", label: "있음" },
             ]}
             onChange={(v) => onChange({ ...d, blob: v === "on" })}
+          />
+          <Field
+            label="하단 박스 제목 (선택, 예: 주요 이력·활동)"
+            value={d.listCard?.title ?? ""}
+            onChange={(v) => onChange({ ...d, listCard: { items: [], ...d.listCard, title: v } })}
+          />
+          <Repeat<string>
+            label="하단 박스 항목"
+            items={d.listCard?.items ?? []}
+            makeNew={() => ""}
+            onChange={(items) => onChange({ ...d, listCard: { title: "", ...d.listCard, items } })}
+            render={(it, update) => <Field label="" value={it} onChange={update} />}
+          />
+          <Field
+            label="하단 박스 링크 라벨 (선택)"
+            value={d.listCard?.link?.label ?? ""}
+            onChange={(v) =>
+              onChange({
+                ...d,
+                listCard: { title: "", items: [], ...d.listCard, link: { href: "", ...d.listCard?.link, label: v } },
+              })
+            }
+          />
+          <Field
+            label="하단 박스 링크 href (선택)"
+            value={d.listCard?.link?.href ?? ""}
+            onChange={(v) =>
+              onChange({
+                ...d,
+                listCard: { title: "", items: [], ...d.listCard, link: { label: "", ...d.listCard?.link, href: v } },
+              })
+            }
           />
           <ButtonsEditor buttons={d.buttons ?? []} onChange={(b) => onChange({ ...d, buttons: b })} />
         </div>
@@ -599,6 +635,52 @@ export default function BlockForm({
             )}
           />
         </div>
+      );
+    }
+    case "raw-html": {
+      const d = data as RawHtmlData;
+      return (
+        <div className="space-y-3">
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "white"}
+            options={[
+              { value: "white", label: "흰색" },
+              { value: "neutral", label: "연회색" },
+              { value: "surface", label: "연한 강조" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v })}
+          />
+          <Field label="HTML (전폭 섹션 내용)" value={d.html} textarea onChange={(v) => onChange({ ...d, html: v })} />
+          <p className="text-xs text-neutral-400">고급: 임의 HTML을 그대로 렌더합니다. 레이아웃이 복잡한 섹션용.</p>
+        </div>
+      );
+    }
+    case "floating-toolbar": {
+      const d = data as FloatingToolbarData;
+      return (
+        <Repeat
+          label="플로팅 버튼"
+          items={d.items ?? []}
+          makeNew={() => ({ icon: "call", href: "tel:031-767-0075", label: "전화", primary: false })}
+          onChange={(items) => onChange({ ...d, items })}
+          render={(it, update) => (
+            <>
+              <Field label="아이콘 (material명)" value={it.icon} onChange={(v) => update({ ...it, icon: v })} />
+              <Field label="링크" value={it.href} onChange={(v) => update({ ...it, href: v })} />
+              <Field label="툴팁 라벨" value={it.label} onChange={(v) => update({ ...it, label: v })} />
+              <Select
+                label="강조"
+                value={it.primary ? "yes" : "no"}
+                options={[
+                  { value: "no", label: "흰색" },
+                  { value: "yes", label: "주황(강조)" },
+                ]}
+                onChange={(v) => update({ ...it, primary: v === "yes" })}
+              />
+            </>
+          )}
+        />
       );
     }
     default:

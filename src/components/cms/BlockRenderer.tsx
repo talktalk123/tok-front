@@ -18,6 +18,8 @@ import type {
   CalloutData,
   TableData,
   CardListData,
+  RawHtmlData,
+  FloatingToolbarData,
 } from "@/lib/cms/blocks";
 
 const SECTION = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
@@ -96,6 +98,13 @@ function HeroBlock({ d }: { d: HeroData }) {
           />
         </div>
       )}
+      {!isImage && d.bgImage && (
+        <img
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-20 z-0"
+          src={d.bgImage}
+        />
+      )}
       <div className={innerCls}>
         <div className={blockCls}>
           {d.breadcrumb && (
@@ -123,8 +132,14 @@ function HeroBlock({ d }: { d: HeroData }) {
           />
           {d.subtitle && (
             <p
-              className={`text-lg md:text-xl leading-relaxed mb-10 ${dark ? "text-neutral-300" : "text-neutral-600"}`}
+              className={`text-lg md:text-xl leading-relaxed ${d.subtitle2 ? "mb-6" : "mb-10"} ${dark ? "text-neutral-300" : "text-neutral-600"}`}
               dangerouslySetInnerHTML={{ __html: d.subtitle }}
+            />
+          )}
+          {d.subtitle2 && (
+            <p
+              className={`text-base leading-relaxed mb-10 ${dark ? "text-neutral-400" : "text-neutral-500"}`}
+              dangerouslySetInnerHTML={{ __html: d.subtitle2 }}
             />
           )}
           {d.tags && d.tags.length > 0 && (
@@ -229,17 +244,27 @@ function CardGridBlock({ d }: { d: CardGridData }) {
           <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
             {d.cards.map((c, i) => {
               const inner = (
-                <div className="flex flex-col items-center w-full">
-                  <div className="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
-                    <span className="material-icons text-primary group-hover:text-white text-4xl">
-                      {c.icon}
-                    </span>
+                <>
+                  <div className="flex flex-col items-center w-full">
+                    <div className="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
+                      <span className="material-icons text-primary group-hover:text-white text-4xl">
+                        {c.icon}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold mb-2 text-stone-900 group-hover:text-primary transition-colors">
+                      {c.title}
+                    </h3>
+                    <p className="text-stone-500 text-xs leading-relaxed mb-4">{c.desc}</p>
                   </div>
-                  <h3 className="text-lg font-bold mb-2 text-stone-900 group-hover:text-primary transition-colors">
-                    {c.title}
-                  </h3>
-                  <p className="text-stone-500 text-xs leading-relaxed">{c.desc}</p>
-                </div>
+                  {c.href && (
+                    <div className="w-full">
+                      <div className="w-full py-2.5 bg-stone-50 group-hover:bg-primary group-hover:text-white rounded-xl text-stone-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                        자세히 보기
+                        <span className="material-icons text-[10px]">arrow_forward</span>
+                      </div>
+                    </div>
+                  )}
+                </>
               );
               const cls =
                 "group relative bg-white p-6 rounded-[2rem] border-2 border-stone-50 card-button-shadow hover:border-primary/40 transition-all duration-300 flex flex-col items-center text-center justify-between";
@@ -315,6 +340,28 @@ function TwoColumnBlock({ d }: { d: TwoColumnData }) {
               {b}
             </span>
           ))}
+        </div>
+      )}
+      {d.listCard && (
+        <div className="bg-neutral-50 rounded-2xl p-8 border border-neutral-100">
+          <h3 className="text-lg font-bold mb-4 text-neutral-900">{d.listCard.title}</h3>
+          <ul className="space-y-2 text-sm text-neutral-700 leading-relaxed">
+            {d.listCard.items.map((it, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-primary">·</span>
+                {it}
+              </li>
+            ))}
+          </ul>
+          {d.listCard.link && (
+            <Link
+              href={d.listCard.link.href}
+              className="mt-6 inline-flex items-center gap-2 text-primary font-bold text-sm hover:gap-3 transition-all"
+            >
+              {d.listCard.link.label}
+              <span className="material-symbols-outlined text-base">arrow_forward</span>
+            </Link>
+          )}
         </div>
       )}
       {d.buttons && <Buttons buttons={d.buttons} />}
@@ -630,6 +677,41 @@ function CardListBlock({ d }: { d: CardListData }) {
   );
 }
 
+function RawHtmlBlock({ d }: { d: RawHtmlData }) {
+  const bg =
+    d.bg === "neutral" ? "bg-neutral-50" : d.bg === "surface" ? "bg-primary-surface" : "bg-white";
+  return (
+    <section className={`py-24 ${bg}`} dangerouslySetInnerHTML={{ __html: d.html }} />
+  );
+}
+
+function FloatingToolbarBlock({ d }: { d: FloatingToolbarData }) {
+  return (
+    <div className="fixed right-6 bottom-10 z-[60] flex flex-col gap-3">
+      {d.items?.map((it, i) => {
+        const ext = it.href?.startsWith("http");
+        return (
+          <a
+            key={i}
+            href={it.href}
+            {...(ext && { target: "_blank", rel: "noopener noreferrer" })}
+            className={`relative w-14 h-14 shadow-xl rounded-full flex items-center justify-center transition-all group ${
+              it.primary
+                ? "bg-primary text-white hover:bg-primary-dark"
+                : "bg-white text-neutral-700 hover:text-primary border border-neutral-100"
+            }`}
+          >
+            <span className="material-icons">{it.icon}</span>
+            <span className="absolute right-16 bg-neutral-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {it.label}
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 /** 단일 블록 렌더 */
 export function RenderBlock({ block }: { block: CmsBlock }) {
   switch (block.type) {
@@ -655,6 +737,10 @@ export function RenderBlock({ block }: { block: CmsBlock }) {
       return <TableBlock d={block.data as TableData} />;
     case "card-list":
       return <CardListBlock d={block.data as CardListData} />;
+    case "raw-html":
+      return <RawHtmlBlock d={block.data as RawHtmlData} />;
+    case "floating-toolbar":
+      return <FloatingToolbarBlock d={block.data as FloatingToolbarData} />;
     default:
       return null;
   }

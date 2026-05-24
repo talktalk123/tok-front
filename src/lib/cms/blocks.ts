@@ -21,8 +21,13 @@ export interface HeroData {
   badge?: string;
   /** HTML 허용 (제목 내 <br/>, <span class="text-primary"> 등 보존) */
   title: string;
+  /** 부제 (HTML 허용). 여러 단락은 줄바꿈 대신 별도 문장으로 */
   subtitle?: string;
+  /** 부제 아래 보조 문단 (home처럼 2단 설명) */
+  subtitle2?: string;
   bg: { type: "color" | "image"; value: string };
+  /** 그라데이션(이미지 없는) 히어로 뒤에 깔리는 흐린 배경 이미지 (선택) */
+  bgImage?: string;
   /** 어두운 배경(흰 글씨) / 밝은 배경(검은 글씨) */
   theme?: "dark" | "light";
   tags?: string[];
@@ -130,7 +135,24 @@ export interface TwoColumnData {
   imageCaption?: { label?: string; title?: string };
   /** 이미지 뒤 흐림 장식 */
   blob?: boolean;
+  /** 텍스트 측 하단 박스(제목+불릿 리스트+링크). home 원장 이력 등 */
+  listCard?: {
+    title: string;
+    items: string[];
+    link?: { label: string; href: string };
+  };
   buttons?: CmsButton[];
+}
+
+/** 전폭 임의 HTML 섹션 (bespoke 레이아웃용. admin 신뢰 입력) */
+export interface RawHtmlData {
+  bg?: "white" | "neutral" | "surface";
+  html: string;
+}
+
+/** 우하단 고정 플로팅 버튼 (home 등) */
+export interface FloatingToolbarData {
+  items: { icon: string; href: string; label: string; primary?: boolean }[];
 }
 
 export interface ProcessStep {
@@ -173,7 +195,9 @@ export type BlockType =
   | "text-panel"
   | "callout"
   | "table"
-  | "card-list";
+  | "card-list"
+  | "raw-html"
+  | "floating-toolbar";
 
 export interface BlockDataMap {
   hero: HeroData;
@@ -187,6 +211,8 @@ export interface BlockDataMap {
   callout: CalloutData;
   table: TableData;
   "card-list": CardListData;
+  "raw-html": RawHtmlData;
+  "floating-toolbar": FloatingToolbarData;
 }
 
 /** 공개/편집 공통 블록. visible 은 admin 편집 시에만 의미. */
@@ -227,6 +253,8 @@ export const BLOCK_REGISTRY: ReadonlyArray<{
   { type: "callout", label: "강조 밴드 (가운데)", icon: "ad_units" },
   { type: "table", label: "표", icon: "table" },
   { type: "card-list", label: "리스트 카드", icon: "list_alt" },
+  { type: "raw-html", label: "임의 HTML 섹션", icon: "code" },
+  { type: "floating-toolbar", label: "플로팅 버튼", icon: "contact_support" },
 ];
 
 export const BLOCK_LABEL: Record<BlockType, string> = Object.fromEntries(
@@ -321,5 +349,16 @@ export function createDefaultBlockData(type: BlockType): BlockDataMap[BlockType]
         columns: 2,
         cards: [{ title: "카드 제목", items: ["항목 1", "항목 2"] }],
       } satisfies CardListData;
+    case "raw-html":
+      return {
+        bg: "white",
+        html: "<div class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">내용</div>",
+      } satisfies RawHtmlData;
+    case "floating-toolbar":
+      return {
+        items: [
+          { icon: "call", href: "tel:031-767-0075", label: "전화" },
+        ],
+      } satisfies FloatingToolbarData;
   }
 }
