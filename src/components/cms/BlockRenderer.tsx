@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import FAQSchema from "@/components/FAQSchema";
+import { fieldToHtml } from "@/lib/cms/blocks";
 import type {
   CmsBlock,
   CmsButton,
@@ -128,18 +129,18 @@ function HeroBlock({ d }: { d: HeroData }) {
           )}
           <h1
             className={`text-4xl md:text-6xl font-bold mb-8 leading-tight ${dark ? "text-white" : "text-neutral-900"}`}
-            dangerouslySetInnerHTML={{ __html: d.title }}
+            dangerouslySetInnerHTML={{ __html: fieldToHtml(d.title, d.titleAccent) }}
           />
           {d.subtitle && (
             <p
               className={`text-lg md:text-xl leading-relaxed ${d.subtitle2 ? "mb-6" : "mb-10"} ${dark ? "text-neutral-300" : "text-neutral-600"}`}
-              dangerouslySetInnerHTML={{ __html: d.subtitle }}
+              dangerouslySetInnerHTML={{ __html: fieldToHtml(d.subtitle) }}
             />
           )}
           {d.subtitle2 && (
             <p
               className={`text-base leading-relaxed mb-10 ${dark ? "text-neutral-400" : "text-neutral-500"}`}
-              dangerouslySetInnerHTML={{ __html: d.subtitle2 }}
+              dangerouslySetInnerHTML={{ __html: fieldToHtml(d.subtitle2) }}
             />
           )}
           {d.tags && d.tags.length > 0 && (
@@ -484,7 +485,7 @@ function TextPanelBlock({ d }: { d: TextPanelData }) {
             <Eyebrow text={d.eyebrow} />
             <h2
               className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-neutral-900"
-              dangerouslySetInnerHTML={{ __html: d.heading }}
+              dangerouslySetInnerHTML={{ __html: fieldToHtml(d.heading, d.headingAccent) }}
             />
             {d.paragraphs?.map((p, i) => (
               <p key={i} className={`${paraColor} leading-relaxed mb-5`}>
@@ -542,7 +543,7 @@ function CalloutBlock({ d }: { d: CalloutData }) {
         <Eyebrow text={d.eyebrow} />
         <h2
           className={`text-2xl md:text-4xl font-bold mb-6 leading-tight ${dark ? "text-white" : "text-neutral-900"}`}
-          dangerouslySetInnerHTML={{ __html: d.heading }}
+          dangerouslySetInnerHTML={{ __html: fieldToHtml(d.heading, d.headingAccent) }}
         />
         {d.text && (
           <p

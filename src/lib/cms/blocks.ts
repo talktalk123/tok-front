@@ -19,11 +19,13 @@ export interface HeroData {
   eyebrow?: string;
   breadcrumb?: string;
   badge?: string;
-  /** HTML 허용 (제목 내 <br/>, <span class="text-primary"> 등 보존) */
+  /** 제목 본문 (plain, 줄바꿈=Enter). 레거시 HTML도 그대로 렌더 */
   title: string;
-  /** 부제 (HTML 허용). 여러 단락은 줄바꿈 대신 별도 문장으로 */
+  /** 제목 강조(주황색) 줄 — 본문 아래 새 줄로 표시 */
+  titleAccent?: string;
+  /** 부제 (plain, 줄바꿈=Enter) */
   subtitle?: string;
-  /** 부제 아래 보조 문단 (home처럼 2단 설명) */
+  /** 부제 아래 보조 문단 */
   subtitle2?: string;
   bg: { type: "color" | "image"; value: string };
   /** 그라데이션(이미지 없는) 히어로 뒤에 깔리는 흐린 배경 이미지 (선택) */
@@ -67,6 +69,8 @@ export interface CardGridData {
 export interface TextPanelData {
   eyebrow?: string;
   heading: string;
+  /** 제목 강조(주황색) 줄 */
+  headingAccent?: string;
   paragraphs: string[];
   /** 강조 인용구 박스(좌측 하단). 비우면 표시 안 함 */
   quote?: string;
@@ -86,6 +90,8 @@ export interface TextPanelData {
 export interface CalloutData {
   eyebrow?: string;
   heading: string;
+  /** 제목 강조(주황색) 줄 */
+  headingAccent?: string;
   text?: string;
   badges?: string[];
   theme?: "surface" | "dark";
@@ -361,4 +367,49 @@ export function createDefaultBlockData(type: BlockType): BlockDataMap[BlockType]
         ],
       } satisfies FloatingToolbarData;
   }
+}
+
+/* ── 비개발자용 텍스트 ↔ HTML 변환 (제목/부제에서 태그를 숨김) ─────────── */
+
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * 렌더용 HTML 생성.
+ * - accent가 정의돼 있으면(신규 모델): 본문(줄바꿈→<br>) + 강조 줄(주황 span)
+ * - accent 없고 본문에 태그가 있으면: 레거시 HTML 그대로
+ * - 그 외: plain 본문 줄바꿈→<br>
+ */
+export function fieldToHtml(text?: string, accent?: string): string {
+  const t = text ?? "";
+  if (accent === undefined) {
+    if (/<[a-z!/]/i.test(t)) return t; // 레거시 HTML
+    return escapeHtml(t).replace(/\n/g, "<br />");
+  }
+  let html = escapeHtml(t).replace(/\n/g, "<br />");
+  if (accent) {
+    html += `<br /><span class="text-primary">${escapeHtml(accent)}</span>`;
+  }
+  return html;
+}
+
+/** 폼 표시용: 저장된 값(plain 또는 레거시 HTML)을 {본문, 강조}로 분해 */
+export function htmlToFields(
+  text?: string,
+  accent?: string,
+): { text: string; accent: string } {
+  if (accent !== undefined) return { text: text ?? "", accent };
+  const raw = text ?? "";
+  if (!/<[a-z!/]/i.test(raw)) return { text: raw, accent: "" };
+  // 레거시 HTML 분해
+  const am = raw.match(/<span[^>]*text-primary[^>]*>([\s\S]*?)<\/span>/i);
+  const acc = am ? am[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "";
+  let lead = raw.replace(/<span[^>]*text-primary[^>]*>[\s\S]*?<\/span>/i, "");
+  lead = lead
+    .replace(/<br\b[^>]*>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{2,}/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
+  return { text: lead, accent: acc };
 }

@@ -21,6 +21,7 @@ import type {
   RawHtmlData,
   FloatingToolbarData,
 } from "@/lib/cms/blocks";
+import { htmlToFields } from "@/lib/cms/blocks";
 
 /* ── 공통 필드 ─────────────────────────────────────────── */
 
@@ -198,14 +199,16 @@ export default function BlockForm({
   switch (type) {
     case "hero": {
       const d = data as HeroData;
+      const t = htmlToFields(d.title, d.titleAccent);
       return (
         <div className="space-y-3">
           <Field label="브레드크럼 (예: 홈 > 한약 진료)" value={d.breadcrumb ?? ""} onChange={(v) => onChange({ ...d, breadcrumb: v })} />
           <Field label="배지 (둥근 라벨, 예: Herbal Medicine)" value={d.badge ?? ""} onChange={(v) => onChange({ ...d, badge: v })} />
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
-          <Field label="제목 (HTML 허용: <br/>, <span class='text-primary'>)" value={d.title} textarea onChange={(v) => onChange({ ...d, title: v })} />
-          <Field label="부제 (HTML 허용)" value={d.subtitle ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle: v })} />
-          <Field label="보조 부제 (선택, HTML 허용)" value={d.subtitle2 ?? ""} textarea onChange={(v) => onChange({ ...d, subtitle2: v })} />
+          <Field label="제목 (줄바꿈은 Enter)" value={t.text} textarea onChange={(v) => onChange({ ...d, title: v, titleAccent: t.accent })} />
+          <Field label="제목 강조(주황색) 줄 — 선택" value={t.accent} onChange={(v) => onChange({ ...d, title: t.text, titleAccent: v })} />
+          <Field label="부제 (줄바꿈은 Enter)" value={htmlToFields(d.subtitle).text} textarea onChange={(v) => onChange({ ...d, subtitle: v })} />
+          <Field label="보조 부제 (선택)" value={htmlToFields(d.subtitle2).text} textarea onChange={(v) => onChange({ ...d, subtitle2: v })} />
           <Field label="흐린 배경 이미지 (선택, 밝은 그라데이션 히어로용)" value={d.bgImage ?? ""} onChange={(v) => onChange({ ...d, bgImage: v })} />
           <Select
             label="테마"
@@ -470,6 +473,7 @@ export default function BlockForm({
     }
     case "text-panel": {
       const d = data as TextPanelData;
+      const th = htmlToFields(d.heading, d.headingAccent);
       return (
         <div className="space-y-3">
           <Select
@@ -482,7 +486,8 @@ export default function BlockForm({
             onChange={(v) => onChange({ ...d, bg: v })}
           />
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
-          <Field label="제목 (HTML 허용)" value={d.heading} textarea onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="제목 (줄바꿈은 Enter)" value={th.text} textarea onChange={(v) => onChange({ ...d, heading: v, headingAccent: th.accent })} />
+          <Field label="제목 강조(주황색) 줄 — 선택" value={th.accent} onChange={(v) => onChange({ ...d, heading: th.text, headingAccent: v })} />
           <Repeat<string>
             label="문단"
             items={d.paragraphs ?? []}
@@ -516,10 +521,12 @@ export default function BlockForm({
     }
     case "callout": {
       const d = data as CalloutData;
+      const ch = htmlToFields(d.heading, d.headingAccent);
       return (
         <div className="space-y-3">
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
-          <Field label="제목 (HTML 허용)" value={d.heading} textarea onChange={(v) => onChange({ ...d, heading: v })} />
+          <Field label="제목 (줄바꿈은 Enter)" value={ch.text} textarea onChange={(v) => onChange({ ...d, heading: v, headingAccent: ch.accent })} />
+          <Field label="제목 강조(주황색) 줄 — 선택" value={ch.accent} onChange={(v) => onChange({ ...d, heading: ch.text, headingAccent: v })} />
           <Field label="설명" value={d.text ?? ""} textarea onChange={(v) => onChange({ ...d, text: v })} />
           <Select
             label="배경"
