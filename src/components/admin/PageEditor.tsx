@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import BlockForm from "@/components/admin/cms/BlockForm";
 import BlockRenderer from "@/components/cms/BlockRenderer";
 import {
@@ -21,6 +21,30 @@ interface EditableBlock {
 
 let tmpCounter = 0;
 const tmpId = () => `tmp-${Date.now()}-${tmpCounter++}`;
+
+const stripTags = (s: string) =>
+  s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+/** 블록 데이터에서 사람이 알아볼 요약 텍스트 추출 (목록에서 기존 내용 식별용) */
+function summarize(type: BlockType, data: Record<string, unknown>): string {
+  if (type === "raw-html") return "임의 HTML 섹션";
+  if (type === "floating-toolbar") return "플로팅 버튼";
+  const d = data as Record<string, unknown> & {
+    items?: { q?: string }[];
+    cards?: { title?: string }[];
+  };
+  const raw =
+    (d.heading as string) ||
+    (d.title as string) ||
+    (d.panelTitle as string) ||
+    (d.text as string) ||
+    (d.eyebrow as string) ||
+    d.items?.[0]?.q ||
+    d.cards?.[0]?.title ||
+    "";
+  const s = stripTags(String(raw || ""));
+  return s.length > 38 ? `${s.slice(0, 38)}…` : s || "(내용 없음)";
+}
 
 export default function PageEditor({ page }: { page: AdminPage }) {
   const [blocks, setBlocks] = useState<EditableBlock[]>(
@@ -108,6 +132,17 @@ export default function PageEditor({ page }: { page: AdminPage }) {
     .filter((b) => b.visible)
     .map((b) => ({ id: b.id, type: b.type, data: b.data }) as unknown as CmsBlock);
 
+  // 미리보기: 실제 데스크톱 화면(1280px)을 축소해 프레임 안에 표시
+  const PREVIEW_W = 1280;
+  const PREVIEW_SCALE = 0.62;
+  const previewInnerRef = useRef<HTMLDivElement>(null);
+  const [previewH, setPreviewH] = useState(0);
+  useLayoutEffect(() => {
+    if (mode === "preview" && previewInnerRef.current) {
+      setPreviewH(previewInnerRef.current.scrollHeight);
+    }
+  }, [mode, blocks]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* 상단 바 */}
@@ -151,12 +186,29 @@ export default function PageEditor({ page }: { page: AdminPage }) {
       )}
 
       {mode === "preview" ? (
-        <div className="flex-1 bg-white">
-          <div className="bg-amber-50 text-amber-700 text-xs text-center py-1.5 border-b border-amber-100">
-            미리보기 — 저장 전 상태입니다 (숨김 블록 제외)
+        <div className="flex-1 bg-neutral-200 overflow-auto">
+          <div className="bg-amber-50 text-amber-700 text-xs text-center py-1.5 border-b border-amber-100 sticky top-0 z-10">
+            미리보기 — 저장 전 상태 · 실제 화면 축소 ({Math.round(PREVIEW_SCALE * 100)}%, 숨김 블록 제외)
           </div>
           {previewBlocks.length ? (
-            <BlockRenderer blocks={previewBlocks} />
+            <div className="p-6 flex justify-center">
+              {/* 축소 프레임: transform으로 고정요소(플로팅 버튼)도 프레임 안에 갇힘 */}
+              <div
+                className="bg-white shadow-2xl rounded-xl border border-neutral-300 overflow-hidden flex-shrink-0"
+                style={{ width: PREVIEW_W * PREVIEW_SCALE, height: previewH * PREVIEW_SCALE || undefined }}
+              >
+                <div
+                  ref={previewInnerRef}
+                  style={{
+                    width: PREVIEW_W,
+                    transform: `scale(${PREVIEW_SCALE})`,
+                    transformOrigin: "top left",
+                  }}
+                >
+                  <BlockRenderer blocks={previewBlocks} />
+                </div>
+              </div>
+            </div>
           ) : (
             <p className="text-center text-neutral-400 py-20">표시할 블록이 없습니다.</p>
           )}
@@ -175,7 +227,7 @@ export default function PageEditor({ page }: { page: AdminPage }) {
                   onClick={() => setSelectedId(b.id)}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-neutral-700 truncate">
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-wide truncate">
                       {i + 1}. {BLOCK_LABEL[b.type] ?? b.type}
                     </span>
                     <div className="flex items-center gap-0.5 text-neutral-400">
@@ -195,6 +247,9 @@ export default function PageEditor({ page }: { page: AdminPage }) {
                       </button>
                     </div>
                   </div>
+                  <p className="text-xs text-neutral-700 truncate mt-0.5">
+                    {summarize(b.type, b.data)}
+                  </p>
                 </div>
               ))}
             </div>
