@@ -94,7 +94,7 @@ export default function HomePage() {
             한약, 추나, 침, 약침, 체외충격파, 자기장치료, 피부미용 장비는 모두 목적이 다릅니다.
             치료 선택지가 많을수록 중요한 것은 많이 하는 것이 아니라, 지금 필요한 치료와 경과를 보며 조정할 치료를 구분하는 것입니다.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Card 1: 한약 */}
             <a className="group relative bg-white p-6 rounded-[2rem] border-2 border-stone-50 card-button-shadow hover:border-primary/40 transition-all duration-300 flex flex-col items-center text-center justify-between" href="/medicine">
               <div className="flex flex-col items-center w-full">
@@ -119,22 +119,6 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2 text-stone-900 group-hover:text-primary transition-colors">구조를 보는 추나·통증 진료</h3>
                 <p className="text-stone-500 text-xs leading-relaxed mb-4">목·허리·어깨·골반 통증은 체형, 근육 긴장,<br />관절 움직임을 함께 살피며 방향을 정합니다.</p>
-              </div>
-              <div className="w-full">
-                <div className="w-full py-2.5 bg-stone-50 group-hover:bg-primary group-hover:text-white rounded-xl text-stone-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
-                  자세히 보기
-                  <span className="material-icons text-[10px]">arrow_forward</span>
-                </div>
-              </div>
-            </a>
-            {/* Card 3: 교통사고 */}
-            <a className="group relative bg-white p-6 rounded-[2rem] border-2 border-stone-50 card-button-shadow hover:border-primary/40 transition-all duration-300 flex flex-col items-center text-center justify-between" href="/car-accident">
-              <div className="flex flex-col items-center w-full">
-                <div className="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
-                  <span className="material-icons text-primary group-hover:text-white text-4xl">car_crash</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-stone-900 group-hover:text-primary transition-colors">자동차보험 교통사고 진료</h3>
-                <p className="text-stone-500 text-xs leading-relaxed mb-4">사고접수번호 안내부터 목·허리 통증, 두통,<br />어깨 결림, 사고 후 몸살까지 별도 흐름으로 봅니다.</p>
               </div>
               <div className="w-full">
                 <div className="w-full py-2.5 bg-stone-50 group-hover:bg-primary group-hover:text-white rounded-xl text-stone-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
@@ -234,43 +218,6 @@ export default function HomePage() {
                 <p className="text-sm text-neutral-500 leading-relaxed">{step.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Block 4b: 교통사고 독립 안내 */}
-      <section className="py-24 bg-neutral-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-sm font-bold text-primary tracking-widest uppercase mb-3">Traffic Accident</p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">교통사고 진료</h2>
-              <p className="text-neutral-300 leading-relaxed mb-4">
-                교통사고 진료는 본원에서 중요한 비중을 차지하는 진료 영역입니다. 사고 직후보다 며칠 뒤 목·허리 통증, 두통, 어깨 긴장, 몸살 같은 불편감이 나타나는 경우가 있어 별도 흐름으로 확인합니다.
-              </p>
-              <p className="text-neutral-300 leading-relaxed mb-8">
-                자동차보험 진료가 필요한 경우 사고접수번호를 알려주시면 접수 절차를 안내드리고, 사고 이후 생긴 증상과 움직임 변화를 함께 확인합니다.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/car-accident" className="px-6 py-3 bg-primary hover:bg-primary-dark rounded-lg font-bold transition-all flex items-center gap-2">
-                  교통사고 진료 보기
-                  <span className="material-symbols-outlined text-base">arrow_forward</span>
-                </Link>
-                <a href="tel:031-767-0075" className="px-6 py-3 border border-white/30 rounded-lg hover:bg-white hover:text-neutral-900 transition-all font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined text-base">call</span>
-                  전화 문의
-                </a>
-              </div>
-            </div>
-            <div className="bg-white/5 backdrop-blur rounded-3xl p-10 border border-white/10">
-              <h3 className="text-xl font-bold mb-6">이런 경우 확인해보세요</h3>
-              <ul className="space-y-4 text-neutral-200">
-                <li className="flex gap-3"><span className="material-symbols-outlined text-primary mt-0.5">check_circle</span><span>사고 후 목·허리 통증이 생긴 경우</span></li>
-                <li className="flex gap-3"><span className="material-symbols-outlined text-primary mt-0.5">check_circle</span><span>두통, 어깨 결림, 등 긴장이 심해진 경우</span></li>
-                <li className="flex gap-3"><span className="material-symbols-outlined text-primary mt-0.5">check_circle</span><span>처음에는 괜찮았는데 며칠 뒤 불편감이 올라온 경우</span></li>
-                <li className="flex gap-3"><span className="material-symbols-outlined text-primary mt-0.5">check_circle</span><span>자동차보험 진료 접수 방법이 헷갈리는 경우</span></li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
