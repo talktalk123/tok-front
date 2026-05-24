@@ -81,8 +81,14 @@ function HeroBlock({ d }: { d: HeroData }) {
     >
       {isImage && (
         <div className="absolute inset-0 z-0">
-          <img alt="" className="w-full h-full object-cover opacity-60 scale-105" src={d.bg.value} />
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-neutral-900/40 to-transparent" />
+          <img
+            alt=""
+            className={`w-full h-full object-cover ${dark ? "opacity-60 scale-105" : ""}`}
+            src={d.bg.value}
+          />
+          <div
+            className={`absolute inset-0 bg-gradient-to-r ${dark ? "from-neutral-900 via-neutral-900/40 to-transparent" : "from-white via-white/85 to-transparent"}`}
+          />
         </div>
       )}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -93,7 +99,13 @@ function HeroBlock({ d }: { d: HeroData }) {
             </p>
           )}
           {d.badge && (
-            <span className="inline-block px-4 py-1.5 bg-primary/20 border border-primary/30 text-primary-300 rounded-full text-sm font-semibold mb-6">
+            <span
+              className={
+                dark
+                  ? "inline-block px-4 py-1.5 bg-primary/20 border border-primary/30 text-primary-300 rounded-full text-sm font-semibold mb-6"
+                  : "inline-block px-3 py-1 bg-primary-light text-primary rounded-full text-xs font-bold mb-4"
+              }
+            >
               {d.badge}
             </span>
           )}
@@ -158,7 +170,7 @@ function CardGridBlock({ d }: { d: CardGridData }) {
         ? "lg:grid-cols-2"
         : "lg:grid-cols-3";
   return (
-    <section className="py-24 bg-neutral-50">
+    <section className={`py-24 ${d.bg === "white" ? "bg-white" : "bg-neutral-50"}`}>
       <div className={SECTION}>
         {(d.heading || d.eyebrow) && (
           <div className="text-center mb-12">
@@ -173,16 +185,24 @@ function CardGridBlock({ d }: { d: CardGridData }) {
             )}
           </div>
         )}
-        {d.variant === "number" ? (
+        {d.variant === "number" || d.variant === "number-lg" ? (
           <div className={`grid grid-cols-1 md:grid-cols-2 ${cols} gap-6`}>
             {d.cards.map((c, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm hover:shadow-md transition-shadow"
+                className={
+                  d.variant === "number-lg"
+                    ? "bg-neutral-50 rounded-2xl p-8 border border-neutral-100 hover:border-primary/40 transition-colors"
+                    : "bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm hover:shadow-md transition-shadow"
+                }
               >
-                <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center font-bold text-lg mb-4">
-                  {c.num ?? String(i + 1)}
-                </div>
+                {d.variant === "number-lg" ? (
+                  <div className="text-3xl font-black text-primary mb-3">{c.num ?? String(i + 1)}</div>
+                ) : (
+                  <div className="w-12 h-12 bg-primary-surface text-primary rounded-xl flex items-center justify-center font-bold text-lg mb-4">
+                    {c.num ?? String(i + 1)}
+                  </div>
+                )}
                 <h3 className="text-xl font-bold mb-3 text-neutral-900">{c.title}</h3>
                 <p className="text-neutral-600 leading-relaxed">{c.desc}</p>
               </div>
@@ -362,18 +382,21 @@ function CtaBlock({ d }: { d: CtaData }) {
 }
 
 function TextPanelBlock({ d }: { d: TextPanelData }) {
+  const surface = d.bg === "surface";
+  const paraColor = surface ? "text-neutral-700" : "text-neutral-600";
+  const isChecklist = !!d.panelItems && d.panelItems.length > 0;
   return (
-    <section className="py-24 bg-white">
+    <section className={`py-24 ${surface ? "bg-primary-surface" : "bg-white"}`}>
       <div className={SECTION}>
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
             <Eyebrow text={d.eyebrow} />
             <h2
-              className="text-3xl md:text-4xl font-bold mb-6 leading-tight"
+              className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-neutral-900"
               dangerouslySetInnerHTML={{ __html: d.heading }}
             />
             {d.paragraphs?.map((p, i) => (
-              <p key={i} className="text-neutral-600 leading-relaxed mb-5">
+              <p key={i} className={`${paraColor} leading-relaxed mb-5`}>
                 {p}
               </p>
             ))}
@@ -383,19 +406,31 @@ function TextPanelBlock({ d }: { d: TextPanelData }) {
               </p>
             )}
           </div>
-          <div className="bg-neutral-50 rounded-3xl p-10 border border-neutral-100">
-            <h3 className="text-xl font-bold mb-6 text-neutral-900">{d.panelTitle}</h3>
-            <ul className="space-y-4">
-              {d.panelItems?.map((item, i) => (
-                <li key={i} className="flex gap-3 text-neutral-700 leading-relaxed">
-                  <span className="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">
-                    check_circle
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {isChecklist ? (
+            <div className="bg-neutral-50 rounded-3xl p-10 border border-neutral-100">
+              <h3 className="text-xl font-bold mb-6 text-neutral-900">{d.panelTitle}</h3>
+              <ul className="space-y-4">
+                {d.panelItems!.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-neutral-700 leading-relaxed">
+                    <span className="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">
+                      check_circle
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="bg-white rounded-3xl p-10 border-2 border-primary/20 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                {d.panelIcon && (
+                  <span className="material-symbols-outlined text-primary text-3xl">{d.panelIcon}</span>
+                )}
+                <h3 className="text-xl font-bold text-neutral-900">{d.panelTitle}</h3>
+              </div>
+              {d.panelText && <p className="text-neutral-600 leading-relaxed">{d.panelText}</p>}
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -438,7 +473,7 @@ function CalloutBlock({ d }: { d: CalloutData }) {
 
 function TableBlock({ d }: { d: TableData }) {
   return (
-    <section className="py-24 bg-white">
+    <section className={`py-24 ${d.bg === "neutral" ? "bg-neutral-50" : "bg-white"}`}>
       <div className={SECTION}>
         {(d.heading || d.eyebrow) && (
           <div className="text-center mb-16">

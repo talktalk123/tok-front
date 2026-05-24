@@ -48,20 +48,31 @@ export interface CardGridData {
   heading?: string;
   intro?: string;
   columns: 2 | 3 | 4;
-  /** icon=아이콘 원형 배지, number=번호 사각 배지 */
-  variant?: "icon" | "number";
+  /** icon=아이콘 원형 배지, number=사각 번호 배지, number-lg=큰 번호 텍스트 */
+  variant?: "icon" | "number" | "number-lg";
+  /** 섹션 배경 (기본 neutral) */
+  bg?: "white" | "neutral";
   cards: CardItem[];
 }
 
-/** 좌(텍스트+인용구) / 우(패널: 제목+체크리스트) 2단 */
+/**
+ * 좌(텍스트+인용구) / 우(패널) 2단.
+ * 우측 패널: panelItems 있으면 체크리스트, 없으면 panelText 하이라이트 카드.
+ */
 export interface TextPanelData {
   eyebrow?: string;
   heading: string;
   paragraphs: string[];
   /** 강조 인용구 박스(좌측 하단). 비우면 표시 안 함 */
   quote?: string;
+  /** 섹션 배경: white(기본) | surface(연한 강조) */
+  bg?: "white" | "surface";
   panelTitle: string;
-  panelItems: string[];
+  /** 체크리스트 모드 */
+  panelItems?: string[];
+  /** 하이라이트 카드 모드 */
+  panelIcon?: string;
+  panelText?: string;
 }
 
 /** 가운데 정렬 강조 밴드 + 배지 칩 */
@@ -78,6 +89,8 @@ export interface TableData {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  /** 섹션 배경 (기본 white) */
+  bg?: "white" | "neutral";
   headers: string[];
   rows: string[][];
 }

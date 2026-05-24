@@ -259,9 +259,19 @@ export default function BlockForm({
             value={d.variant ?? "icon"}
             options={[
               { value: "icon", label: "아이콘 카드(가운데)" },
-              { value: "number", label: "번호 카드(왼쪽)" },
+              { value: "number", label: "사각 번호 카드" },
+              { value: "number-lg", label: "큰 번호 카드" },
             ]}
             onChange={(v) => onChange({ ...d, variant: v })}
+          />
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "neutral"}
+            options={[
+              { value: "neutral", label: "연한 회색" },
+              { value: "white", label: "흰색" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v })}
           />
           <Select
             label="열 개수"
@@ -400,6 +410,15 @@ export default function BlockForm({
       const d = data as TextPanelData;
       return (
         <div className="space-y-3">
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "white"}
+            options={[
+              { value: "white", label: "흰색" },
+              { value: "surface", label: "연한 강조(primary-surface)" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v })}
+          />
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
           <Field label="제목 (HTML 허용)" value={d.heading} textarea onChange={(v) => onChange({ ...d, heading: v })} />
           <Repeat<string>
@@ -410,6 +429,7 @@ export default function BlockForm({
             render={(p, update) => <Field label="" value={p} textarea onChange={update} />}
           />
           <Field label="강조 인용구 (선택)" value={d.quote ?? ""} textarea onChange={(v) => onChange({ ...d, quote: v })} />
+          <p className="text-xs text-neutral-400 pt-2">우측 패널 — 체크리스트 항목이 있으면 체크리스트, 없으면 아이콘+본문 하이라이트 카드로 표시됩니다.</p>
           <Field label="우측 패널 제목" value={d.panelTitle} onChange={(v) => onChange({ ...d, panelTitle: v })} />
           <Repeat<string>
             label="우측 패널 항목 (체크리스트)"
@@ -418,6 +438,8 @@ export default function BlockForm({
             onChange={(panelItems) => onChange({ ...d, panelItems })}
             render={(it, update) => <Field label="" value={it} onChange={update} />}
           />
+          <Field label="하이라이트 아이콘 (체크리스트 비울 때)" value={d.panelIcon ?? ""} onChange={(v) => onChange({ ...d, panelIcon: v })} />
+          <Field label="하이라이트 본문 (체크리스트 비울 때)" value={d.panelText ?? ""} textarea onChange={(v) => onChange({ ...d, panelText: v })} />
         </div>
       );
     }
@@ -451,6 +473,15 @@ export default function BlockForm({
       const d = data as TableData;
       return (
         <div className="space-y-3">
+          <Select
+            label="섹션 배경"
+            value={d.bg ?? "white"}
+            options={[
+              { value: "white", label: "흰색" },
+              { value: "neutral", label: "연한 회색" },
+            ]}
+            onChange={(v) => onChange({ ...d, bg: v })}
+          />
           <Field label="윗 라벨(eyebrow)" value={d.eyebrow ?? ""} onChange={(v) => onChange({ ...d, eyebrow: v })} />
           <Field label="제목" value={d.heading ?? ""} onChange={(v) => onChange({ ...d, heading: v })} />
           <Field label="소개 문구" value={d.intro ?? ""} textarea onChange={(v) => onChange({ ...d, intro: v })} />
