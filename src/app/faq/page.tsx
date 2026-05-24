@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { getCmsPage } from "@/lib/cms/pages";
+import CmsPageShell from "@/components/cms/CmsPage";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import FAQSchema from "@/components/FAQSchema";
@@ -170,7 +173,25 @@ const faqSections = [
   },
 ];
 
-export default function FaqPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getCmsPage("faq");
+  const seo = page?.theme?.seo;
+  if (seo?.title || seo?.description) {
+    return { title: seo.title, description: seo.description };
+  }
+  return {};
+}
+
+export default async function FaqPage() {
+  // CMS에 보이는 블록이 있으면 CMS로 렌더, 없으면 기존 콘텐츠 폴백
+  const page = await getCmsPage("faq");
+  if (page && page.blocks.length > 0) {
+    return <CmsPageShell page={page} activePage="/faq" />;
+  }
+  return <FaqFallback />;
+}
+
+function FaqFallback() {
   const allFaqItems = faqSections.flatMap((s) => s.items);
   return (
     <>

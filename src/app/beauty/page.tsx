@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { getCmsPage } from "@/lib/cms/pages";
+import CmsPageShell from "@/components/cms/CmsPage";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
@@ -26,7 +29,25 @@ const BEAUTY_FAQ: FAQItem[] = [
   },
 ];
 
-export default function BeautyPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getCmsPage("beauty");
+  const seo = page?.theme?.seo;
+  if (seo?.title || seo?.description) {
+    return { title: seo.title, description: seo.description };
+  }
+  return {};
+}
+
+export default async function BeautyPage() {
+  // CMS에 보이는 블록이 있으면 CMS로 렌더, 없으면 기존 콘텐츠 폴백
+  const page = await getCmsPage("beauty");
+  if (page && page.blocks.length > 0) {
+    return <CmsPageShell page={page} activePage="/beauty" />;
+  }
+  return <BeautyFallback />;
+}
+
+function BeautyFallback() {
   return (
     <>
       <Navbar activePage="/beauty" />
