@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import type { PageSeo } from "@partyvelope/react-block-cms";
 import { SITE_CONFIG } from "@/lib/site-config";
+
+/** CMS 페이지 설정(theme.seo) 형태 — 패키지 타입과 동일하되 여기서 독립 선언(배포 트리가 패키지에 의존하지 않도록) */
+export interface PageSeo {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
 
 /**
  * 페이지별 SEO 단일 원천 — canonical·제목·설명·OG 를 페이지마다 자기 값으로 낸다.
