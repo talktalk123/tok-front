@@ -41,9 +41,7 @@ export const metadata: Metadata = {
     "스킨부스터",
     "이기홍 원장",
   ],
-  alternates: {
-    canonical: SITE_CONFIG.url,
-  },
+  // canonical / og:url 은 페이지별로 src/lib/seo.ts(buildPageMetadata)가 낸다 — 루트에 두면 모든 하위 페이지가 홈으로 상속됨
   authors: [
     { name: SITE_CONFIG.ownerName, url: `${SITE_CONFIG.url}/about` },
   ],
@@ -74,7 +72,6 @@ export const metadata: Metadata = {
     siteName: SITE_CONFIG.name,
     title: `${SITE_CONFIG.name} | 경기광주 탄벌동 한의원`,
     description: SITE_CONFIG.description,
-    url: SITE_CONFIG.url,
     locale: "ko_KR",
   },
   ...(NAVER_VERIFICATION || GOOGLE_VERIFICATION

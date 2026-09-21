@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import FAQSchema, { type FAQItem } from "@/components/FAQSchema";
 import { getCmsPage } from "@/lib/cms/pages";
+import { buildPageMetadata } from "@/lib/seo";
 import CmsPageShell from "@/components/cms/CmsPage";
 
 const ABOUT_FAQ: FAQItem[] = [
@@ -30,12 +31,9 @@ const ABOUT_FAQ: FAQItem[] = [
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
+  // 페이지별 canonical·제목·설명 — CMS(theme.seo) 값이 있으면 우선, 없으면 src/lib/seo.ts 기본값
   const page = await getCmsPage("about");
-  const seo = page?.theme?.seo;
-  if (seo?.title || seo?.description) {
-    return { title: seo.title, description: seo.description };
-  }
-  return {};
+  return buildPageMetadata("about", page?.theme?.seo);
 }
 
 export default async function AboutPage() {
