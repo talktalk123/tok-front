@@ -15,7 +15,12 @@ const lexend = Lexend({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const NAVER_VERIFICATION = process.env.NEXT_PUBLIC_NAVER_VERIFICATION;
+// 네이버 서치어드바이저 소유확인 — 사이트는 http/https 를 별개로 등록하므로 토큰이 여러 개일 수 있다(전부 <meta> 로 출력).
+// https://talkbr.com 사이트 토큰(담당자 제공 2026-09-22)은 코드에 고정, 추가 토큰은 env NEXT_PUBLIC_NAVER_VERIFICATION 로.
+const NAVER_VERIFICATION = [
+  "11e0731d5305db494b86cb379e22ed9e790e74f3",
+  process.env.NEXT_PUBLIC_NAVER_VERIFICATION,
+].filter((v): v is string => !!v);
 const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION;
 
 // 빌드 시점을 dateModified·콘텐츠 신선도 신호로 사용
@@ -74,11 +79,11 @@ export const metadata: Metadata = {
     description: SITE_CONFIG.description,
     locale: "ko_KR",
   },
-  ...(NAVER_VERIFICATION || GOOGLE_VERIFICATION
+  ...(NAVER_VERIFICATION.length > 0 || GOOGLE_VERIFICATION
     ? {
         verification: {
           ...(GOOGLE_VERIFICATION && { google: GOOGLE_VERIFICATION }),
-          ...(NAVER_VERIFICATION && {
+          ...(NAVER_VERIFICATION.length > 0 && {
             other: { "naver-site-verification": NAVER_VERIFICATION },
           }),
         },
