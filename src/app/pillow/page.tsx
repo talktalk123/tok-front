@@ -25,7 +25,7 @@ export default function PillowPage() {
   return (
     <>
       <Navbar activePage="/pillow" />
-      <main>
+      <div>
         <header className="bg-gradient-to-br from-orange-50 via-white to-stone-50 py-16 md:py-24">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div>
@@ -70,7 +70,7 @@ export default function PillowPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
       <SiteFooter />
     </>
   );
