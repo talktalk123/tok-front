@@ -7,7 +7,7 @@ export const SITE_CONFIG = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://talkbr.com"
   ).replace(/\/$/, ""),
   ownerName: "이기홍",
-  businessNumber: "465-09-08212",
+  businessNumber: "465-09-03212",
   email: "talktalkhani@naver.com",
   phone: "031-767-0075",
   address: {

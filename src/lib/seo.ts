@@ -42,7 +42,7 @@ export const PAGE_SEO: Record<SeoSlug, PageSeoDefaults> = {
   },
   about: {
     path: "/about",
-    title: "이기홍 원장 소개 · 진료 철학",
+    title: "원장 소개 · 진료 철학",
     description:
       "톡바른경희한의원 본점 이기홍 원장(경희대학교 한의과대학)의 이력과 강의·저서 활동, 진료 철학을 소개합니다. 증상과 몸의 내부 상태, 구조, 피부 상태를 함께 살펴 치료 방향을 설명하는 진료입니다.",
   },
