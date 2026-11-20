@@ -51,7 +51,7 @@ export default function Navbar({ activePage, variant = "sticky" }: NavbarProps) 
           </details>
         </div>
       </div>
-      <style>{"body .tbr-mobile{display:none!important}body>main>nav.tbr-shared-nav>div>div.hidden>a{font-size:16px!important}.tbr-shared-menu-button::-webkit-details-marker{display:none}@media(max-width:1023px){body>main>nav.tbr-shared-nav>div:first-child{padding-right:12px!important;padding-left:14px!important}}@media(max-width:420px){.tbr-shared-nav .text-2xl{font-size:1.08rem!important}.tbr-shared-nav .tbr-booking{font-size:11px;padding:9px 10px}}"}</style>
+      <style>{"body .tbr-mobile{display:none!important}body>main>nav.tbr-shared-nav>div>div.hidden>a{font-size:16px!important}.tbr-shared-menu-button::-webkit-details-marker{display:none}@media(max-width:1023px){body>main>nav.tbr-shared-nav>div:first-child{padding-right:12px!important;padding-left:14px!important}}@media(max-width:420px){.tbr-shared-nav .text-2xl{font-size:1.08rem!important}.tbr-shared-nav .tbr-booking{font-size:11px;padding:9px 10px}}@media(max-width:360px){.tbr-shared-nav .text-2xl{font-size:15px!important}.tbr-shared-nav .tbr-booking{padding:8px 7px}.tbr-shared-nav .tbr-shared-menu-button{width:36px;height:36px}}"}</style>
     </nav>
   );
 }
