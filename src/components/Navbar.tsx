@@ -9,7 +9,7 @@ const navItems = [
   { label: "추나·통증", href: "/chuna" },
   { label: "교통사고", href: "/car-accident" },
   { label: "피부미용", href: "/beauty" },
-  { label: "맞춤 베개", href: "/#pillow" },
+  { label: "맞춤 베개", href: "/pillow" },
   { label: "진료 안내", href: "/how-to-come" },
   { label: "FAQ", href: "/faq" },
 ];
@@ -44,7 +44,7 @@ export default function Navbar({ activePage, variant = "sticky" }: NavbarProps) 
             <div className="fixed top-20 left-0 right-0 grid grid-cols-2 gap-x-3 gap-y-1 bg-white border-t border-stone-100 shadow-lg px-5 py-4">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="py-3 px-2 text-base font-bold text-stone-700 hover:text-primary">
-                  {item.label}{item.href === "/#pillow" ? " · 준비중" : ""}
+                  {item.label}{item.href === "/pillow" ? " · 준비중" : ""}
                 </Link>
               ))}
             </div>
