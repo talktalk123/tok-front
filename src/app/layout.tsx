@@ -160,7 +160,7 @@ const siteNavigationLd = {
     { "@type": "SiteNavigationElement", position: 3, name: "추나·통증", url: `${SITE_CONFIG.url}/chuna` },
     { "@type": "SiteNavigationElement", position: 4, name: "교통사고", url: `${SITE_CONFIG.url}/car-accident` },
     { "@type": "SiteNavigationElement", position: 5, name: "피부미용", url: `${SITE_CONFIG.url}/beauty` },
-    { "@type": "SiteNavigationElement", position: 6, name: "맞춤 베개", url: `${SITE_CONFIG.url}/#pillow` },
+    { "@type": "SiteNavigationElement", position: 6, name: "맞춤 베개", url: `${SITE_CONFIG.url}/pillow` },
     { "@type": "SiteNavigationElement", position: 7, name: "진료 안내", url: `${SITE_CONFIG.url}/how-to-come` },
     { "@type": "SiteNavigationElement", position: 8, name: "FAQ", url: `${SITE_CONFIG.url}/faq` },
   ],
